@@ -12,12 +12,22 @@ export function useNetworkStatus() {
     isConnected: true,
     wasOffline: false,
   });
-  const previouslyConnected = useRef<boolean>(true);
+  const previouslyConnected = useRef<boolean | null>(null);
 
   useEffect(() => {
+    // Get initial connection state
+    NetInfo.fetch().then(state => {
+      const isConnected = state.isConnected ?? false;
+      previouslyConnected.current = isConnected;
+      setNetworkState({
+        isConnected,
+        wasOffline: false,
+      });
+    });
+
     const unsubscribe = NetInfo.addEventListener(state => {
       const isConnected = state.isConnected ?? false;
-      const wasOffline = !previouslyConnected.current && isConnected;
+      const wasOffline = previouslyConnected.current === false && isConnected;
       
       setNetworkState({
         isConnected,
