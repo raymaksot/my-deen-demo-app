@@ -569,6 +569,31 @@ app.get('/api/admin/dashboard', authRequired, adminRequired, async (req, res) =>
   res.json({ pendingComments, groups, events });
 });
 
+app.get('/api/admin/comments', authRequired, adminRequired, async (req, res) => {
+  const { status = 'pending', page = 1, limit = 20 } = req.query;
+  const skip = (Number(page) - 1) * Number(limit);
+  
+  const [comments, total] = await Promise.all([
+    Comment.find({ status })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit)),
+    Comment.countDocuments({ status })
+  ]);
+  
+  // Manually fetch user data for each comment
+  const userIds = [...new Set(comments.map(c => c.userId))];
+  const users = await User.find({ _id: { $in: userIds } }).select('name email');
+  const userMap = Object.fromEntries(users.map(u => [u._id.toString(), u]));
+  
+  const commentsWithUsers = comments.map(comment => ({
+    ...comment.toObject(),
+    userId: userMap[comment.userId] || { name: 'Unknown', email: 'unknown@example.com' }
+  }));
+  
+  res.json({ data: commentsWithUsers, page: Number(page), limit: Number(limit), total });
+});
+
 app.post('/api/admin/comments/:id/approve', authRequired, adminRequired, async (req, res) => {
   const c = await Comment.findById(req.params.id);
   if (!c) return res.status(404).json({ message: 'Not found' });
