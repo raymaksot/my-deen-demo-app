@@ -14,6 +14,8 @@ export default function QADetailScreen() {
 	const [loading, setLoading] = useState(false);
 	const user = useAppSelector((s) => s.auth.user);
 	const [answerLikes, setAnswerLikes] = useState(0);
+	const [liked, setLiked] = useState(false);
+	const [likeLoading, setLikeLoading] = useState(false);
 	const { pending } = useOfflineSync();
 
 	useEffect(() => {
@@ -35,6 +37,20 @@ export default function QADetailScreen() {
 		}
 	}
 
+	async function handleLike() {
+		if (!item?._id || likeLoading) return;
+		setLikeLoading(true);
+		try {
+			const result = await qaService.toggleLike(item._id);
+			setLiked(result.liked);
+			setAnswerLikes(result.likesCount);
+		} catch (error) {
+			console.error('Error toggling like:', error);
+		} finally {
+			setLikeLoading(false);
+		}
+	}
+
 	const canAnswer = user?.role === 'scholar' || user?.role === 'admin';
 
 	return (
@@ -44,8 +60,14 @@ export default function QADetailScreen() {
 			<Text style={styles.section}>Answer</Text>
 			<Text>{item?.answer || 'Not answered yet'}</Text>
 			<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-				<TouchableOpacity onPress={() => setAnswerLikes((n) => n + 1)} style={styles.likeBtn}>
-					<Text>Like answer</Text>
+				<TouchableOpacity 
+					onPress={handleLike} 
+					style={[styles.likeBtn, liked && styles.likeBtnActive]}
+					disabled={likeLoading}
+				>
+					<Text style={[styles.likeBtnText, liked && styles.likeBtnTextActive]}>
+						{likeLoading ? 'Loading...' : liked ? 'Liked' : 'Like answer'}
+					</Text>
 				</TouchableOpacity>
 				<Text>{answerLikes} likes</Text>
 			</View>
@@ -74,4 +96,7 @@ const styles = StyleSheet.create({
 	btn: { marginTop: 8, backgroundColor: '#0E7490', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
 	btnText: { color: '#fff', fontWeight: '600' },
 	likeBtn: { backgroundColor: '#f3f4f6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8 },
+	likeBtnActive: { backgroundColor: '#0E7490' },
+	likeBtnText: { color: '#374151' },
+	likeBtnTextActive: { color: '#fff' },
 });
