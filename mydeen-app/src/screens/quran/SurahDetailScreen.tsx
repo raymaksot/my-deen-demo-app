@@ -24,17 +24,23 @@ export default function SurahDetailScreen() {
   const [ayahs, setAyahs] = useState<Ayah[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isOffline, setIsOffline] = useState(false);
   const [selectedAyah, setSelectedAyah] = useState<Ayah | null>(null);
   const [showDetail, setShowDetail] = useState(false);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
+      setError(null);
+      setIsOffline(false);
       try {
         const data = await quranService.getSurahAyahs(surah.number);
         setAyahs(data);
       } catch (e: any) {
         setError(e.message);
+        if (e.message.includes('Network unavailable')) {
+          setIsOffline(true);
+        }
       } finally {
         setLoading(false);
       }
@@ -83,8 +89,28 @@ export default function SurahDetailScreen() {
           <Text style={{ fontSize: 20 }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{surah.englishName} - {surah.name}</Text>
-        <TouchableOpacity style={{ padding: 4 }} onPress={() => { /* settings if needed */ }}>
-          <Text style={{ fontSize: 20 }}>⚙️</Text>
+        <TouchableOpacity style={{ padding: 4 }} onPress={() => {
+          if (isOffline) {
+            // Retry loading ayahs
+            (async () => {
+              setLoading(true);
+              setError(null);
+              setIsOffline(false);
+              try {
+                const data = await quranService.getSurahAyahs(surah.number);
+                setAyahs(data);
+              } catch (e: any) {
+                setError(e.message);
+                if (e.message.includes('Network unavailable')) {
+                  setIsOffline(true);
+                }
+              } finally {
+                setLoading(false);
+              }
+            })();
+          }
+        }}>
+          <Text style={{ fontSize: 20 }}>{isOffline ? '📡' : '⚙️'}</Text>
         </TouchableOpacity>
       </View>
       <FlatList
@@ -95,6 +121,15 @@ export default function SurahDetailScreen() {
         ListEmptyComponent={
           loading ? (
             <Text style={{ padding: 16 }}>Loading…</Text>
+          ) : isOffline ? (
+            <View style={{ padding: 16, alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, color: '#6B7280', marginBottom: 8 }}>
+                You're offline
+              </Text>
+              <Text style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center' }}>
+                No cached ayahs available for this surah. Please connect to the internet to load the verses.
+              </Text>
+            </View>
           ) : (
             <Text style={{ padding: 16 }}>{error || 'No data'}</Text>
           )

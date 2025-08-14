@@ -24,16 +24,21 @@ export default function QuranScreen() {
   const [filtered, setFiltered] = useState<Surah[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
+      setIsOffline(false);
       try {
         const data = await quranService.getSurahs();
         setSurahs(data);
         setFiltered(data);
-      } catch (e) {
+      } catch (e: any) {
         console.error('Failed to load surahs', e);
+        if (e.message.includes('Network unavailable')) {
+          setIsOffline(true);
+        }
       } finally {
         setLoading(false);
       }
@@ -91,7 +96,28 @@ export default function QuranScreen() {
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Al ‑ Quran</Text>
         <View style={styles.headerActions}>
-          {/* Search button can be integrated here if needed */}
+          {isOffline && (
+            <TouchableOpacity 
+              style={styles.offlineIndicator}
+              onPress={async () => {
+                setLoading(true);
+                setIsOffline(false);
+                try {
+                  const data = await quranService.getSurahs();
+                  setSurahs(data);
+                  setFiltered(data);
+                } catch (e: any) {
+                  if (e.message.includes('Network unavailable')) {
+                    setIsOffline(true);
+                  }
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              <Text style={styles.offlineText}>📡 Retry</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       {/* Search bar */}
@@ -132,6 +158,15 @@ export default function QuranScreen() {
         ListEmptyComponent={
           loading ? (
             <Text style={{ padding: 16 }}>Loading…</Text>
+          ) : isOffline ? (
+            <View style={{ padding: 16, alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, color: '#6B7280', marginBottom: 8 }}>
+                You're offline
+              </Text>
+              <Text style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center' }}>
+                No cached surahs available. Please connect to the internet to load Quran data.
+              </Text>
+            </View>
           ) : (
             <Text style={{ padding: 16 }}>No surah found</Text>
           )
@@ -189,4 +224,17 @@ const styles = StyleSheet.create({
   surahName: { fontSize: 16, fontWeight: '600', color: '#111827' },
   surahTranslation: { fontSize: 12, color: '#6B7280', marginTop: 4 },
   arabicName: { fontSize: 18, fontWeight: '700', color: '#0E7490' },
+  offlineIndicator: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#F59E0B',
+  },
+  offlineText: {
+    fontSize: 12,
+    color: '#92400E',
+    fontWeight: '600',
+  },
 });
