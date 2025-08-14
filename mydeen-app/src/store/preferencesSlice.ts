@@ -2,10 +2,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type ThemeMode = 'light' | 'dark';
 
+export interface PrayerNotifications {
+	fajr: boolean;
+	dhuhr: boolean;
+	asr: boolean;
+	maghrib: boolean;
+	isha: boolean;
+}
+
 export interface PrayerPreferences {
 	calculationMethod: string; // e.g., 'MWL', 'ISNA', 'Makkah'
 	highLatitudeRule: string; // 'MidNight', 'Seventh', 'AngleBased'
 	timezone?: string;
+	notifications: PrayerNotifications;
 }
 
 export interface PreferencesState {
@@ -20,6 +29,13 @@ const initialState: PreferencesState = {
 	prayer: {
 		calculationMethod: 'MWL',
 		highLatitudeRule: 'MidNight',
+		notifications: {
+			fajr: true,
+			dhuhr: false,
+			asr: true,
+			maghrib: true,
+			isha: false,
+		},
 	},
 };
 

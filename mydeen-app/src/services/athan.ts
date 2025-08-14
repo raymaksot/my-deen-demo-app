@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import dayjs from 'dayjs';
 import { PrayerTimesResponse } from './prayerService';
+import { PrayerNotifications } from '@/store/preferencesSlice';
 
 function toFutureDate(timeStr: string): Date | null {
 	if (!timeStr) return null;
@@ -11,17 +12,30 @@ function toFutureDate(timeStr: string): Date | null {
 	return dt.toDate();
 }
 
-export async function schedulePrayerNotifications(times: PrayerTimesResponse) {
-	const mapping: [string, string][] = [
-		['Fajr', times.fajr],
-		['Dhuhr', times.dhuhr],
-		['Asr', times.asr],
-		['Maghrib', times.maghrib],
-		['Isha', times.isha],
+export async function schedulePrayerNotifications(
+	times: PrayerTimesResponse,
+	notifications?: PrayerNotifications
+) {
+	// Cancel all existing prayer notifications first
+	await Notifications.cancelAllScheduledNotificationsAsync();
+
+	const mapping: [string, string, keyof PrayerNotifications][] = [
+		['Fajr', times.fajr, 'fajr'],
+		['Dhuhr', times.dhuhr, 'dhuhr'],
+		['Asr', times.asr, 'asr'],
+		['Maghrib', times.maghrib, 'maghrib'],
+		['Isha', times.isha, 'isha'],
 	];
-	for (const [name, t] of mapping) {
+	
+	for (const [name, t, notificationKey] of mapping) {
+		// Skip if notifications are provided and this prayer is disabled
+		if (notifications && !notifications[notificationKey]) {
+			continue;
+		}
+		
 		const when = toFutureDate(t);
 		if (!when) continue;
+		
 		await Notifications.scheduleNotificationAsync({
 			content: { title: `Athan - ${name}`, body: `${name} time has arrived` },
 			trigger: when,
