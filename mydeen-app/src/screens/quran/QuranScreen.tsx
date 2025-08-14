@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { quranService, Surah } from '@/services/quranService';
+import { TextInputField, Card } from '@/components/common';
+import { useThemeColors } from '@/theme/theme';
 
 /**
  * QuranScreen renders a list of surahs (chapters) in the Qur’an and allows
@@ -24,6 +26,7 @@ export default function QuranScreen() {
   const [filtered, setFiltered] = useState<Surah[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const colors = useThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -95,15 +98,12 @@ export default function QuranScreen() {
         </View>
       </View>
       {/* Search bar */}
-      <View style={styles.searchBox}>
-        <TextInput
-          placeholder="Search surah or Verse"
-          placeholderTextColor="#9CA3AF"
-          value={search}
-          onChangeText={setSearch}
-          style={styles.searchInput}
-        />
-      </View>
+      <TextInputField
+        placeholder="Search surah or Verse"
+        value={search}
+        onChangeText={setSearch}
+        style={styles.searchBox}
+      />
       {/* Continue reading card */}
       <TouchableOpacity
         style={styles.continueCard}
