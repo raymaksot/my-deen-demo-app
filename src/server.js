@@ -537,7 +537,8 @@ app.get('/api/events/:id', authRequired, async (req, res) => {
   const event = await Event.findById(req.params.id);
   if (!event) return res.status(404).json({ message: 'Not found' });
   const count = await Registration.countDocuments({ eventId: event._id });
-  res.json({ ...event.toObject(), registrationsCount: count });
+  const userRegistration = await Registration.findOne({ eventId: event._id, userId: req.user.sub });
+  res.json({ ...event.toObject(), registrationsCount: count, registered: !!userRegistration });
 });
 
 app.post('/api/events/:id/register', authRequired, async (req, res) => {

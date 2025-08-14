@@ -4,7 +4,7 @@ import { apiDelete, apiGet, apiPost } from '@/services/api';
 import * as Notifications from 'expo-notifications';
 import { useRoute } from '@react-navigation/native';
 
-interface EventDetail { _id: string; title: string; startsAt: string; endsAt?: string; location?: string; description?: string; registrationsCount?: number }
+interface EventDetail { _id: string; title: string; startsAt: string; endsAt?: string; location?: string; description?: string; registrationsCount?: number; registered?: boolean }
 
 export default function EventDetailScreen() {
 	const route = useRoute<any>();
@@ -18,6 +18,7 @@ export default function EventDetailScreen() {
 			const res = await apiGet<EventDetail>(`/api/events/${id}`);
 			setItem(res);
 			setCount(res.registrationsCount ?? 0);
+			setRegistered(res.registered ?? false);
 		})();
 	}, [id]);
 

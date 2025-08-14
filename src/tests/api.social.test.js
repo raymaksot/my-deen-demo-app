@@ -55,4 +55,35 @@ describe('Events', () => {
     expect(get.status).toBe(200);
     expect(get.body.registrationsCount).toBe(1);
   });
+
+  it('should return registration status for current user', async () => {
+    const admin = sign({ sub: 'admin', role: 'admin' });
+    const user1 = sign({ sub: 'u1', role: 'user' });
+    const user2 = sign({ sub: 'u2', role: 'user' });
+    const start = new Date(Date.now() + 3600 * 1000).toISOString();
+    
+    // Create event
+    const ev = await request(app).post('/api/events').set('Authorization', `Bearer ${admin}`).send({ title: 'Iftar', startsAt: start });
+    expect(ev.status).toBe(200);
+    const id = ev.body._id;
+    
+    // Check unregistered user
+    const get1 = await request(app).get(`/api/events/${id}`).set('Authorization', `Bearer ${user1}`);
+    expect(get1.status).toBe(200);
+    expect(get1.body.registered).toBe(false);
+    
+    // Register user1
+    const rsvp = await request(app).post(`/api/events/${id}/register`).set('Authorization', `Bearer ${user1}`);
+    expect(rsvp.status).toBe(200);
+    
+    // Check registered user1
+    const get2 = await request(app).get(`/api/events/${id}`).set('Authorization', `Bearer ${user1}`);
+    expect(get2.status).toBe(200);
+    expect(get2.body.registered).toBe(true);
+    
+    // Check unregistered user2
+    const get3 = await request(app).get(`/api/events/${id}`).set('Authorization', `Bearer ${user2}`);
+    expect(get3.status).toBe(200);
+    expect(get3.body.registered).toBe(false);
+  });
 });
