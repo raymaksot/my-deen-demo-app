@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type ThemeMode = 'light' | 'dark';
 
@@ -36,8 +37,33 @@ const preferencesSlice = createSlice({
 		setPrayerPreferences(state, action: PayloadAction<PrayerPreferences>) {
 			state.prayer = action.payload;
 		},
+		hydrate(state, action: PayloadAction<Partial<PreferencesState>>) {
+			return { ...state, ...action.payload };
+		},
 	},
 });
 
-export const { setThemeMode, setLocale, setPrayerPreferences } = preferencesSlice.actions;
+export const { setThemeMode, setLocale, setPrayerPreferences, hydrate } = preferencesSlice.actions;
+
+// Storage persistence functions
+const STORAGE_KEY = 'preferences';
+
+export async function loadPreferencesFromStorage(): Promise<Partial<PreferencesState>> {
+	try {
+		const saved = await AsyncStorage.getItem(STORAGE_KEY);
+		return saved ? JSON.parse(saved) : {};
+	} catch (error) {
+		console.error('Failed to load preferences from storage:', error);
+		return {};
+	}
+}
+
+export async function savePreferencesToStorage(preferences: PreferencesState): Promise<void> {
+	try {
+		await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+	} catch (error) {
+		console.error('Failed to save preferences to storage:', error);
+	}
+}
+
 export default preferencesSlice.reducer;

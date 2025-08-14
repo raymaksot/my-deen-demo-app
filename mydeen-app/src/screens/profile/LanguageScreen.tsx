@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setLocale } from '@/store/preferencesSlice';
 import { setUser } from '@/store/authSlice';
@@ -22,6 +23,7 @@ interface LanguageOption {
 // List of supported languages and associated flag emoji.  Expand as needed.
 const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
   { code: 'en-uk', label: 'English - UK', flag: '🇬🇧' },
   { code: 'ms', label: 'Melayu', flag: '🇲🇾' },
   { code: 'ja', label: 'Japanese', flag: '🇯🇵' },
@@ -39,6 +41,7 @@ export default function LanguageScreen() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
   const currentLocale = useAppSelector((s) => s.preferences.locale);
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<string>(currentLocale);
   const [filtered, setFiltered] = useState<LanguageOption[]>(LANGUAGE_OPTIONS);
@@ -81,13 +84,13 @@ export default function LanguageScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 4 }}>
           <Text style={{ fontSize: 20 }}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Language</Text>
+        <Text style={styles.headerTitle}>{t('language')}</Text>
         <View style={{ width: 24 }} />
       </View>
       {/* Search bar */}
       <View style={styles.searchBox}>
         <TextInput
-          placeholder="Search language"
+          placeholder={t('searchLanguage')}
           placeholderTextColor="#9CA3AF"
           value={search}
           onChangeText={setSearch}
@@ -95,7 +98,7 @@ export default function LanguageScreen() {
         />
       </View>
       {/* Language choices */}
-      <Text style={styles.sectionTitle}>Language Choice</Text>
+      <Text style={styles.sectionTitle}>{t('languageChoice')}</Text>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }}>
         {filtered.map((opt) => {
           const isSelected = selected === opt.code;
@@ -117,7 +120,9 @@ export default function LanguageScreen() {
         onPress={handleSelect}
         disabled={saving}
       >
-        <Text style={{ color: '#fff', fontWeight: '600' }}>{saving ? 'Saving…' : 'Select Language'}</Text>
+        <Text style={{ color: '#fff', fontWeight: '600' }}>
+          {saving ? t('saving') : t('selectLanguage')}
+        </Text>
       </TouchableOpacity>
     </View>
   );

@@ -3,9 +3,11 @@ import React, { useEffect } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { Provider } from 'react-redux';
+import { I18nextProvider } from 'react-i18next';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { store } from '@/store';
+import { hydrate, loadPreferencesFromStorage } from '@/store/preferencesSlice';
 import RootNavigator from '@/navigation/RootNavigator';
 import i18n from './src/i18n';
 import { useAppSelector } from '@/store/hooks';
@@ -23,6 +25,10 @@ function AppInner() {
 	useEffect(() => {
 		store.dispatch(initAuthFromStorage());
 		(async () => {
+			// Bootstrap preferences from storage
+			const saved = await loadPreferencesFromStorage();
+			store.dispatch(hydrate(saved));
+			
 			if (Device.isDevice) {
 				await registerDeviceTokenWithBackend();
 			}
@@ -35,10 +41,12 @@ function AppInner() {
 	}, [locale]);
 
 	return (
-		<NavigationContainer theme={navTheme}>
-			<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
-			<RootNavigator />
-		</NavigationContainer>
+		<I18nextProvider i18n={i18n}>
+			<NavigationContainer theme={navTheme}>
+				<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
+				<RootNavigator />
+			</NavigationContainer>
+		</I18nextProvider>
 	);
 }
 
