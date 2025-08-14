@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'r
 import { apiGet, apiPost } from '@/services/api';
 import { useRoute } from '@react-navigation/native';
 import { useAppSelector } from '@/store/hooks';
+import { groupsService } from '@/services/groupsService';
 
 interface Member { userId: string; role: 'owner' | 'member' }
 interface Group { _id: string; name: string; description?: string }
@@ -18,6 +19,10 @@ export default function GroupDetailScreen() {
 	const [progress, setProgress] = useState<Progress[]>([]);
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [msg, setMsg] = useState('');
+	const [joinLeaveLoading, setJoinLeaveLoading] = useState(false);
+
+	// Check if current user is a member
+	const isUserMember = user && members.some(member => member.userId === user._id);
 
 	useEffect(() => {
 		(async () => {
@@ -39,10 +44,67 @@ export default function GroupDetailScreen() {
 		setMsg('');
 	}
 
+	async function handleJoinGroup() {
+		if (!user || joinLeaveLoading) return;
+		
+		try {
+			setJoinLeaveLoading(true);
+			await groupsService.join(id);
+			// Add current user to members list
+			setMembers(prev => [...prev, { userId: user._id, role: 'member' }]);
+		} catch (error) {
+			console.error('Failed to join group:', error);
+		} finally {
+			setJoinLeaveLoading(false);
+		}
+	}
+
+	async function handleLeaveGroup() {
+		if (!user || joinLeaveLoading) return;
+		
+		try {
+			setJoinLeaveLoading(true);
+			await groupsService.leave(id);
+			// Remove current user from members list
+			setMembers(prev => prev.filter(member => member.userId !== user._id));
+		} catch (error) {
+			console.error('Failed to leave group:', error);
+		} finally {
+			setJoinLeaveLoading(false);
+		}
+	}
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>{group?.name}</Text>
 			<Text style={{ color: '#6b7280' }}>{group?.description}</Text>
+
+			{/* Join/Leave Button */}
+			{user && (
+				<View style={{ marginTop: 12 }}>
+					{isUserMember ? (
+						<TouchableOpacity 
+							onPress={handleLeaveGroup} 
+							style={[styles.primary, { backgroundColor: '#dc2626' }]}
+							disabled={joinLeaveLoading}
+						>
+							<Text style={styles.primaryText}>
+								{joinLeaveLoading ? 'Leaving...' : 'Leave'}
+							</Text>
+						</TouchableOpacity>
+					) : (
+						<TouchableOpacity 
+							onPress={handleJoinGroup} 
+							style={styles.primary}
+							disabled={joinLeaveLoading}
+						>
+							<Text style={styles.primaryText}>
+								{joinLeaveLoading ? 'Joining...' : 'Join'}
+							</Text>
+						</TouchableOpacity>
+					)}
+				</View>
+			)}
 
 			<Text style={styles.section}>Members</Text>
 			<FlatList data={members} keyExtractor={(i) => i.userId} renderItem={({ item }) => <Text>- {item.userId} {item.role === 'owner' ? '(Owner)' : ''}</Text>} />
