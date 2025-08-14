@@ -9,7 +9,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -46,9 +48,15 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.2.2",
+    "@types/jest": "^30.0.0",
     "@types/react": "18.2.48",
     "@types/react-redux": "^7.1.33",
     "babel-plugin-module-resolver": "^5.0.2",
+    "jest": "^30.0.5",
+    "jest-environment-jsdom": "^30.0.5",
+    "react-test-renderer": "^18.2.0",
     "typescript": "~5.4.0"
   }
 }
