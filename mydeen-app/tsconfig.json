@@ -48,6 +48,15 @@
       ],
       "@/config/*": [
         "src/config/*"
+      ],
+      "@/hooks/*": [
+        "src/hooks/*"
+      ],
+      "@/offline/*": [
+        "src/offline/*"
+      ],
+      "@/notifications/*": [
+        "src/notifications/*"
       ]
     }
   },
