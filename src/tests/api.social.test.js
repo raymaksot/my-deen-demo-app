@@ -55,4 +55,24 @@ describe('Events', () => {
     expect(get.status).toBe(200);
     expect(get.body.registrationsCount).toBe(1);
   });
+
+  it('should list user registered events', async () => {
+    const admin = sign({ sub: 'admin', role: 'admin' });
+    const user = sign({ sub: 'u3', role: 'user' });
+    const start = new Date(Date.now() + 3600 * 1000).toISOString();
+    const ev = await request(app).post('/api/events').set('Authorization', `Bearer ${admin}`).send({ title: 'Test Event', startsAt: start });
+    expect(ev.status).toBe(200);
+    const id = ev.body._id;
+    
+    // Register user for event
+    const rsvp = await request(app).post(`/api/events/${id}/register`).set('Authorization', `Bearer ${user}`);
+    expect(rsvp.status).toBe(200);
+    
+    // Get user's events
+    const myEvents = await request(app).get('/api/events/my').set('Authorization', `Bearer ${user}`);
+    expect(myEvents.status).toBe(200);
+    expect(Array.isArray(myEvents.body)).toBe(true);
+    expect(myEvents.body.length).toBeGreaterThanOrEqual(1);
+    expect(myEvents.body.some(event => event._id === id)).toBe(true);
+  });
 });

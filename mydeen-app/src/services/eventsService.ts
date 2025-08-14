@@ -4,6 +4,7 @@ export interface EventItem { _id: string; title: string; startsAt: string; endsA
 
 export const eventsService = {
   list(): Promise<EventItem[]> { return apiGet('/api/events'); },
+  myEvents(): Promise<EventItem[]> { return apiGet('/api/events/my'); },
   get(id: string): Promise<EventItem> { return apiGet(`/api/events/${id}`); },
   create(input: Partial<EventItem>): Promise<EventItem> { return apiPost('/api/events', input); },
   register(id: string): Promise<{ registered: boolean; registrationsCount: number }> { return apiPost(`/api/events/${id}/register`); },

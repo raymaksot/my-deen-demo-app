@@ -62,6 +62,13 @@ export default function ProfileScreen() {
       <Text style={styles.sectionHeader}>Account Settings</Text>
       <TouchableOpacity
         style={styles.listItem}
+        onPress={() => navigation.navigate('MyEvents')}
+      >
+        <Text style={styles.listText}>My Events</Text>
+        <Text style={styles.listArrow}>›</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.listItem}
         onPress={() => navigation.navigate('Settings')}
       >
         <Text style={styles.listText}>Account Preferences</Text>

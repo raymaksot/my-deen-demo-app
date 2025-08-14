@@ -629,6 +629,13 @@ app.get('/api/events', authRequired, async (req, res) => {
   res.json(upcoming);
 });
 
+app.get('/api/events/my', authRequired, async (req, res) => {
+  const registrations = await Registration.find({ userId: req.user.sub });
+  const eventIds = registrations.map(r => r.eventId);
+  const events = await Event.find({ _id: { $in: eventIds } }).sort({ startsAt: 1 });
+  res.json(events);
+});
+
 app.get('/api/events/:id', authRequired, async (req, res) => {
   const event = await Event.findById(req.params.id);
   if (!event) return res.status(404).json({ message: 'Not found' });
