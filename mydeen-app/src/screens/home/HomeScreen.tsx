@@ -12,8 +12,9 @@ import * as Location from 'expo-location';
 import { prayerService, PrayerTimesResponse } from '@/services/prayerService';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '@/store/hooks';
-import { schedulePrayerNotifications } from '@/services/athan';
+import { schedulePrayerNotifications, scheduleDailyContentNotification } from '@/services/athan';
 import { useThemeColors } from '@/theme/theme';
+import DailyContent from '@/components/DailyContent';
 
 export default function HomeScreen() {
 	const navigation = useNavigation<any>();
@@ -42,6 +43,7 @@ export default function HomeScreen() {
 				const res = await prayerService.getTodayTimes(lat, lng, calcMethod);
 				setTimes(res);
 				await schedulePrayerNotifications(res);
+				await scheduleDailyContentNotification();
 			} catch (e: any) {
 				setError(e.message);
 			}
@@ -139,6 +141,9 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
+
+            {/* Daily Content Section */}
+            <DailyContent />
 
             {/* Featured Cult Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 24 }}>

@@ -165,6 +165,74 @@ const MOSQUES = [
   },
 ];
 
+// Sample Hadith collection for daily content. These are from Sahih al-Bukhari
+// and other authentic collections to provide meaningful daily inspiration.
+const HADITHS = [
+  {
+    id: 'h1',
+    collection: 'Sahih al-Bukhari',
+    bookNumber: '1',
+    number: '1',
+    text: 'إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى',
+    translation: 'Actions are but by intention and every man shall have only that which he intended.',
+    narrator: 'Umar ibn al-Khattab (RA)',
+  },
+  {
+    id: 'h2',
+    collection: 'Sahih Muslim',
+    bookNumber: '1',
+    number: '99',
+    text: 'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',
+    translation: 'A Muslim is one from whose tongue and hand the Muslims are safe.',
+    narrator: 'Abdullah ibn Amr (RA)',
+  },
+  {
+    id: 'h3',
+    collection: 'Sahih al-Bukhari',
+    bookNumber: '2',
+    number: '13',
+    text: 'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',
+    translation: 'None of you believes until he loves for his brother what he loves for himself.',
+    narrator: 'Anas ibn Malik (RA)',
+  },
+  {
+    id: 'h4',
+    collection: 'Sahih Muslim',
+    bookNumber: '4',
+    number: '2203',
+    text: 'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ',
+    translation: 'Whoever believes in Allah and the Last Day should speak good or remain silent.',
+    narrator: 'Abu Hurairah (RA)',
+  },
+  {
+    id: 'h5',
+    collection: 'Sahih al-Bukhari',
+    bookNumber: '8',
+    number: '6011',
+    text: 'الْمُؤْمِنُ لَيْسَ بِالطَّعَّانِ وَلَا اللَّعَّانِ وَلَا الْفَاحِشِ وَلَا الْبَذِيءِ',
+    translation: 'The believer is not one who eats his fill while his neighbor goes hungry.',
+    narrator: 'Ibn Masud (RA)',
+  },
+  {
+    id: 'h6',
+    collection: 'Sunan at-Tirmidhi',
+    bookNumber: '19',
+    number: '1987',
+    text: 'خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ',
+    translation: 'The best of people are those who benefit others.',
+    narrator: 'Jabir ibn Abdullah (RA)',
+  },
+  {
+    id: 'h7',
+    collection: 'Sahih Muslim',
+    bookNumber: '32',
+    number: '6261',
+    text: 'مَنْ نَفَّسَ عَنْ مُؤْمِنٍ كُرْبَةً مِنْ كُرَبِ الدُّنْيَا نَفَّسَ اللَّهُ عَنْهُ كُرْبَةً مِنْ كُرَبِ يَوْمِ الْقِيَامَةِ',
+    translation: 'Whoever relieves a believer\'s distress of the distressful aspects of this world, Allah will rescue him from a difficulty of the difficulties of the Hereafter.',
+    narrator: 'Abu Hurairah (RA)',
+  },
+];
+
 // -----------------------------------------------------------------------------
 // Sample data for articles and videos.  These arrays power the Articles and
 // Videos pages in the mobile app when running the development server.  In a
@@ -602,6 +670,49 @@ app.get('/api/quran/surah/:number', async (req, res) => {
   res.json(ayahs);
 });
 
+// Get a random daily Ayah. This returns a random verse from Al-Fatiha for demonstration.
+// In a real implementation, this would select from the entire Quran and potentially
+// cache the daily selection to ensure consistency throughout the day.
+app.get('/api/quran/daily-ayah', async (req, res) => {
+  const fatihaAyahs = SURAH_AYAHS[1] || [];
+  if (fatihaAyahs.length === 0) {
+    return res.status(404).json({ message: 'No ayahs available' });
+  }
+  
+  // Use current date as seed for consistent daily selection
+  const today = new Date().toDateString();
+  const seed = today.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  const randomIndex = seed % fatihaAyahs.length;
+  const selectedAyah = fatihaAyahs[randomIndex];
+  
+  res.json({
+    ...selectedAyah,
+    surah: {
+      number: 1,
+      name: 'الفاتحة',
+      englishName: 'Al‑Fatiha',
+      englishNameTranslation: 'The Opener',
+    }
+  });
+});
+
+// Get a random daily Hadith. This returns a random hadith from the collection
+// and uses the current date as a seed to ensure the same hadith is returned
+// throughout the day.
+app.get('/api/hadith/daily-hadith', async (req, res) => {
+  if (HADITHS.length === 0) {
+    return res.status(404).json({ message: 'No hadiths available' });
+  }
+  
+  // Use current date as seed for consistent daily selection
+  const today = new Date().toDateString();
+  const seed = today.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+  const randomIndex = seed % HADITHS.length;
+  const selectedHadith = HADITHS[randomIndex];
+  
+  res.json(selectedHadith);
+});
+
 // -----------------------------------------------------------------------------
 // Prayer times endpoints
 //
@@ -653,6 +764,41 @@ app.get('/api/prayer/month', async (req, res) => {
 // coordinates.
 app.get('/api/mosques', async (req, res) => {
   res.json(MOSQUES);
+});
+
+// -----------------------------------------------------------------------------
+// Hadith endpoints
+//
+// Provide search functionality for hadiths and daily hadith selection.
+// The search endpoint filters by text content while the daily endpoint
+// returns a consistent selection for the current day.
+
+// Search hadiths by query string
+app.get('/api/hadith/search', async (req, res) => {
+  const { q = '', page = 1, limit = 20 } = req.query;
+  const query = q.toLowerCase();
+  
+  let filteredHadiths = HADITHS;
+  if (query) {
+    filteredHadiths = HADITHS.filter(h => 
+      h.text.toLowerCase().includes(query) ||
+      h.translation.toLowerCase().includes(query) ||
+      h.collection.toLowerCase().includes(query) ||
+      h.narrator.toLowerCase().includes(query)
+    );
+  }
+  
+  const startIndex = (Number(page) - 1) * Number(limit);
+  const endIndex = startIndex + Number(limit);
+  const paginatedData = filteredHadiths.slice(startIndex, endIndex);
+  
+  res.json({
+    data: paginatedData,
+    page: Number(page),
+    limit: Number(limit),
+    total: filteredHadiths.length,
+    totalPages: Math.ceil(filteredHadiths.length / Number(limit))
+  });
 });
 
 // -----------------------------------------------------------------------------
