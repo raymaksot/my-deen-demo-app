@@ -30,6 +30,7 @@ import ReadingGroupsScreen from '@/screens/groups/ReadingGroupsScreen';
 import GroupDetailScreen from '@/screens/groups/GroupDetailScreen';
 import EventsScreen from '@/screens/events/EventsScreen';
 import EventDetailScreen from '@/screens/events/EventDetailScreen';
+import MyEventsScreen from '@/screens/events/MyEventsScreen';
 import { TermsScreen, PrivacyScreen } from '@/screens/settings/TermsPrivacyScreens';
 import QiblaCompass from '@/screens/places/QiblaCompass';
 import ProfileScreen from '@/screens/profile/ProfileScreen';
@@ -91,6 +92,7 @@ export default function RootNavigator() {
                     <Stack.Screen name="QADetail" component={QADetailScreen} />
                     <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
                     <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+                    <Stack.Screen name="MyEvents" component={MyEventsScreen} />
                     <Stack.Screen name="Articles" component={ArticlesScreen} />
                     <Stack.Screen name="Videos" component={VideosScreen} />
                     <Stack.Screen name="VideoDetail" component={VideoDetailScreen} />
