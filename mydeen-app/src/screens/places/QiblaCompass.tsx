@@ -1,10 +1,35 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Magnetometer } from 'expo-sensors';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Magnetometer, Accelerometer } from 'expo-sensors';
 
-// Compute the heading (degrees) from magnetometer readings.  Returns a value
-// between 0 and 360, where 0 is north.  The calculations use atan2 on the
-// y/x axes.  If the device returns negative values we adjust to positive.
+// Compute the tilt-compensated heading (degrees) from magnetometer and accelerometer readings.
+// Returns a value between 0 and 360, where 0 is north. Uses accelerometer data to compensate for device tilt.
+function calculateTiltCompensatedHeading(
+  mag: { x: number; y: number; z: number },
+  accel: { x: number; y: number; z: number }
+) {
+  // Normalize accelerometer data
+  const norm = Math.sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z);
+  const ax = accel.x / norm;
+  const ay = accel.y / norm;
+  const az = accel.z / norm;
+  
+  // Calculate roll and pitch from accelerometer
+  const roll = Math.atan2(ay, az);
+  const pitch = Math.atan2(-ax, Math.sqrt(ay * ay + az * az));
+  
+  // Tilt compensation for magnetometer
+  const magXComp = mag.x * Math.cos(pitch) + mag.z * Math.sin(pitch);
+  const magYComp = mag.x * Math.sin(roll) * Math.sin(pitch) + mag.y * Math.cos(roll) - mag.z * Math.sin(roll) * Math.cos(pitch);
+  
+  // Calculate heading with tilt compensation
+  let heading = Math.atan2(magYComp, magXComp) * (180 / Math.PI);
+  
+  // Normalize to 0-360 degrees
+  return heading >= 0 ? heading : heading + 360;
+}
+
+// Fallback function for magnetometer-only heading calculation
 function calculateHeading({ x, y }: { x: number; y: number }) {
   let angle = Math.atan2(y, x) * (180 / Math.PI);
   return angle >= 0 ? angle : angle + 360;
