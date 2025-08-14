@@ -15,7 +15,8 @@
     "types": [
       "react",
       "react-native",
-      "react-native-web"
+      "react-native-web",
+      "jest"
     ],
     "baseUrl": ".",
     "paths": {
@@ -48,6 +49,12 @@
       ],
       "@/config/*": [
         "src/config/*"
+      ],
+      "@/offline/*": [
+        "src/offline/*"
+      ],
+      "@/*": [
+        "src/*"
       ]
     }
   },
