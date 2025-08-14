@@ -1,6 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
 import LoginScreen from '@/screens/auth/LoginScreen';
 import RegisterScreen from '@/screens/auth/RegisterScreen';
@@ -41,17 +42,18 @@ const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
 
 function MainTabs() {
+	const { t } = useTranslation();
 	return (
 		<Tabs.Navigator>
-			<Tabs.Screen name="Home" component={HomeScreen} />
-			<Tabs.Screen name="Quran" component={QuranScreen} />
-			<Tabs.Screen name="Duas" component={DuasScreen} />
-			<Tabs.Screen name="Hadith" component={HadithScreen} />
-			<Tabs.Screen name="QA" component={QAScreen} />
-			<Tabs.Screen name="Places" component={PlacesScreen} />
-			<Tabs.Screen name="Groups" component={ReadingGroupsScreen} />
-			<Tabs.Screen name="Events" component={EventsScreen} />
-            <Tabs.Screen name="Profile" component={ProfileScreen} />
+			<Tabs.Screen name="Home" component={HomeScreen} options={{ title: t('home') }} />
+			<Tabs.Screen name="Quran" component={QuranScreen} options={{ title: t('quran') }} />
+			<Tabs.Screen name="Duas" component={DuasScreen} options={{ title: t('duas') }} />
+			<Tabs.Screen name="Hadith" component={HadithScreen} options={{ title: t('hadith') }} />
+			<Tabs.Screen name="QA" component={QAScreen} options={{ title: t('qa') }} />
+			<Tabs.Screen name="Places" component={PlacesScreen} options={{ title: t('places') }} />
+			<Tabs.Screen name="Groups" component={ReadingGroupsScreen} options={{ title: t('groups') }} />
+			<Tabs.Screen name="Events" component={EventsScreen} options={{ title: t('events') }} />
+            <Tabs.Screen name="Profile" component={ProfileScreen} options={{ title: t('profile') }} />
 		</Tabs.Navigator>
 	);
 }

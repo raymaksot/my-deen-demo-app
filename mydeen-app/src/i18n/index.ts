@@ -54,6 +54,13 @@ const resources = {
 			login: 'Login',
 			register: 'Register',
 			logout: 'Logout',
+			
+			// Home screen
+			featuredCult: 'Featured Cult',
+			latestArticle: 'Latest Article',
+			nearestMosque: 'Nearest Mosque',
+			seeAll: 'See All',
+			nextPrayerIs: 'Next prayer is',
 		},
 	},
 	ar: {
@@ -107,6 +114,13 @@ const resources = {
 			login: 'تسجيل الدخول',
 			register: 'إنشاء حساب',
 			logout: 'تسجيل الخروج',
+			
+			// Home screen
+			featuredCult: 'المحتوى المميز',
+			latestArticle: 'أحدث المقالات',
+			nearestMosque: 'أقرب مسجد',
+			seeAll: 'عرض الكل',
+			nextPrayerIs: 'الصلاة القادمة هي',
 		},
 	},
 };

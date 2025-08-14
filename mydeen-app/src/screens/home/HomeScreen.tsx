@@ -8,15 +8,18 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
 import { prayerService, PrayerTimesResponse } from '@/services/prayerService';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '@/store/hooks';
 import { schedulePrayerNotifications } from '@/services/athan';
 import { useThemeColors } from '@/theme/theme';
+// import TestI18n from '@/components/TestI18n';
 
 export default function HomeScreen() {
 	const navigation = useNavigation<any>();
+	const { t } = useTranslation();
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 	const [times, setTimes] = useState<PrayerTimesResponse | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -106,6 +109,10 @@ export default function HomeScreen() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 24 }}>
+            {/* Test i18n component - uncomment for testing 
+            <TestI18n />
+            */}
+            
             {/* Hero / greeting */}
             <ImageBackground
                 // Use a generic background for hero.  In a real app you would swap
@@ -135,7 +142,9 @@ export default function HomeScreen() {
                         onPress={() => navigation.navigate('FindQibla')}
                         style={styles.findQiblaBtn}
                     >
-                        <Text style={{ color: colors.background === '#0B1220' ? '#fff' : '#0E7490', fontSize: 12, fontWeight: '600' }}>Find Qibla</Text>
+                        <Text style={{ color: colors.background === '#0B1220' ? '#fff' : '#0E7490', fontSize: 12, fontWeight: '600' }}>
+                            {t('qibla')}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
@@ -143,8 +152,10 @@ export default function HomeScreen() {
             {/* Featured Cult Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Featured Cult</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Videos')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('featuredCult')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Videos')}>
+                        <Text style={styles.seeAll}>{t('seeAll')}</Text>
+                    </TouchableOpacity>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
                     {videos.map((v) => (
@@ -169,8 +180,10 @@ export default function HomeScreen() {
             {/* Latest Article Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 32 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Latest Article</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Articles')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('latestArticle')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Articles')}>
+                        <Text style={styles.seeAll}>{t('seeAll')}</Text>
+                    </TouchableOpacity>
                 </View>
                 {articles.map((a) => (
                     <TouchableOpacity
@@ -191,8 +204,10 @@ export default function HomeScreen() {
             {/* Nearest Mosque Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 32, marginBottom: 24 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Nearest Mosque</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('FindMosque')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('nearestMosque')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('FindMosque')}>
+                        <Text style={styles.seeAll}>{t('seeAll')}</Text>
+                    </TouchableOpacity>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
                     {mosquesList.map((m) => (

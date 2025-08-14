@@ -30,7 +30,7 @@ function AppInner() {
 			store.dispatch(hydrate(saved));
 			
 			if (Device.isDevice) {
-				await registerDeviceTokenWithBackend();
+				await registerDeviceToken('', ''); // Placeholder parameters
 			}
 			await registerBackgroundTasks();
 		})();

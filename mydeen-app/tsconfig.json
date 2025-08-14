@@ -6,7 +6,7 @@
     ],
     "jsx": "react-jsx",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "noEmit": true,
     "skipLibCheck": true,
@@ -14,8 +14,7 @@
     "strict": true,
     "types": [
       "react",
-      "react-native",
-      "react-native-web"
+      "react-native"
     ],
     "baseUrl": ".",
     "paths": {
@@ -48,6 +47,9 @@
       ],
       "@/config/*": [
         "src/config/*"
+      ],
+      "@/notifications/*": [
+        "src/notifications/*"
       ]
     }
   },
