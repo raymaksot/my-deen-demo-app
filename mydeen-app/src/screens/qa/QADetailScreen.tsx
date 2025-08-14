@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { qaService, QAItem } from '@/services/qaService';
 import { useAppSelector } from '@/store/hooks';
 import { CommentsThread } from '@/components/CommentsThread';
 import { useOfflineSync } from '@/offline/useOfflineSync';
+import { PrimaryButton, SecondaryButton, TextInputField } from '@/components/common';
 
 export default function QADetailScreen() {
 	const route = useRoute<any>();
@@ -44,17 +45,27 @@ export default function QADetailScreen() {
 			<Text style={styles.section}>Answer</Text>
 			<Text>{item?.answer || 'Not answered yet'}</Text>
 			<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-				<TouchableOpacity onPress={() => setAnswerLikes((n) => n + 1)} style={styles.likeBtn}>
-					<Text>Like answer</Text>
-				</TouchableOpacity>
+				<SecondaryButton 
+					title="Like answer"
+					onPress={() => setAnswerLikes((n) => n + 1)}
+					style={styles.likeBtn}
+				/>
 				<Text>{answerLikes} likes</Text>
 			</View>
 			{canAnswer && (
 				<View style={{ marginTop: 12 }}>
-					<TextInput value={answer} onChangeText={setAnswer} placeholder="Write your answer" style={styles.input} multiline />
-					<TouchableOpacity style={styles.btn} onPress={submit} disabled={loading}>
-						<Text style={styles.btnText}>{loading ? 'Submitting…' : 'Submit'}</Text>
-					</TouchableOpacity>
+					<TextInputField 
+						value={answer} 
+						onChangeText={setAnswer} 
+						placeholder="Write your answer" 
+						multiline 
+					/>
+					<PrimaryButton 
+						title={loading ? 'Submitting…' : 'Submit'}
+						onPress={submit} 
+						loading={loading}
+						style={{ marginTop: 8 }}
+					/>
 				</View>
 			)}
 			<Text style={styles.section}>Comments {pending ? `(queue: ${pending})` : ''}</Text>
@@ -70,8 +81,5 @@ const styles = StyleSheet.create({
 	title: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
 	q: { marginBottom: 12 },
 	section: { fontSize: 16, fontWeight: '700', marginTop: 12, marginBottom: 8 },
-	input: { borderColor: '#e5e7eb', borderWidth: 1, borderRadius: 8, padding: 12, minHeight: 80 },
-	btn: { marginTop: 8, backgroundColor: '#0E7490', paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
-	btnText: { color: '#fff', fontWeight: '600' },
-	likeBtn: { backgroundColor: '#f3f4f6', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 8 },
+	likeBtn: { paddingVertical: 6, paddingHorizontal: 10 },
 });

@@ -13,6 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { googleLogin } from '@/store/authSlice';
 import { ENV } from '@/config/env';
 import { useThemeColors } from '@/theme/theme';
+import { PrimaryButton, SecondaryButton } from '@/components/common';
 
 /**
  * WelcomeScreen renders the initial onboarding experience.  It shows
@@ -54,19 +55,31 @@ export default function WelcomeScreen() {
           adipiscing ut iaculis amet urna id integer libero.
         </Text>
         {/* Sign up with Google */}
-        <TouchableOpacity
+        <SecondaryButton
+          title="Sign Up with Google"
           onPress={() => promptAsync()}
-          style={[styles.socialBtn, { borderColor: colors.background === '#0B1220' ? colors.border : '#fff', backgroundColor: colors.background === '#0B1220' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.1)' }]}
-        >
-          <Text style={[styles.socialText, { color: colors.text }]}>Sign Up with Google</Text>
-        </TouchableOpacity>
+          style={[
+            styles.socialBtn, 
+            { 
+              borderColor: colors.background === '#0B1220' ? colors.border : '#fff',
+              backgroundColor: 'rgba(255,255,255,0.1)'
+            }
+          ]}
+          textStyle={{ color: colors.text }}
+        />
         {/* Sign up with Facebook */}
-        <TouchableOpacity
+        <SecondaryButton
+          title="Sign Up with Facebook"
           onPress={() => {}}
-          style={[styles.socialBtn, { borderColor: colors.background === '#0B1220' ? colors.border : '#fff', backgroundColor: colors.background === '#0B1220' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.1)' }]}
-        >
-          <Text style={[styles.socialText, { color: colors.text }]}>Sign Up with Facebook</Text>
-        </TouchableOpacity>
+          style={[
+            styles.socialBtn, 
+            { 
+              borderColor: colors.background === '#0B1220' ? colors.border : '#fff',
+              backgroundColor: 'rgba(255,255,255,0.1)'
+            }
+          ]}
+          textStyle={{ color: colors.text }}
+        />
         {/* Divider */}
         <View style={styles.dividerRow}>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -74,20 +87,15 @@ export default function WelcomeScreen() {
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
         </View>
         {/* Sign in with email */}
-        <TouchableOpacity
+        <PrimaryButton
+          title="Sign In with Email"
           onPress={() => navigation.navigate('Login')}
+          loading={status === 'loading'}
           style={[
             styles.primaryBtn,
             { backgroundColor: colors.primary },
-            status === 'loading' && { backgroundColor: colors.primary + '60' },
           ]}
-        >
-          {status === 'loading' ? (
-            <ActivityIndicator color={colors.text} />
-          ) : (
-            <Text style={[styles.primaryText, { color: '#fff' }]}>Sign In with Email</Text>
-          )}
-        </TouchableOpacity>
+        />
       </View>
     </ImageBackground>
   );
@@ -118,18 +126,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   socialBtn: {
-    borderWidth: 1,
-    borderColor: '#fff',
     borderRadius: 24,
-    paddingVertical: 14,
-    alignItems: 'center',
     marginBottom: 12,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  socialText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
   dividerRow: {
     flexDirection: 'row',
@@ -142,17 +140,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#374151',
   },
   primaryBtn: {
-    backgroundColor: '#0E7490',
-    paddingVertical: 14,
     borderRadius: 24,
-    alignItems: 'center',
-  },
-  primaryBtnDisabled: {
-    backgroundColor: '#164e63',
-  },
-  primaryText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
