@@ -504,7 +504,7 @@ app.post('/api/likes/toggle', authRequired, async (req, res) => {
 });
 
 // Reading Groups
-app.post('/api/reading-groups', authRequired, async (req, res) => {
+app.post('/api/reading-groups', authRequired, adminRequired, async (req, res) => {
   const { name, description, target, schedule } = req.body || {};
   if (!name) return res.status(400).json({ message: 'name required' });
   const group = await ReadingGroup.create({ name, description, createdBy: req.user.sub, target: target || { type: 'quran', scope: 'full' }, schedule: schedule || {}, createdAt: new Date() });
@@ -536,6 +536,34 @@ app.post('/api/reading-groups/:id/join', authRequired, async (req, res) => {
 app.post('/api/reading-groups/:id/leave', authRequired, async (req, res) => {
   await GroupMember.deleteOne({ groupId: req.params.id, userId: req.user.sub });
   res.json({ left: true });
+});
+
+app.put('/api/reading-groups/:id', authRequired, adminRequired, async (req, res) => {
+  const { name, description, target, schedule } = req.body || {};
+  if (!name) return res.status(400).json({ message: 'name required' });
+  const group = await ReadingGroup.findByIdAndUpdate(
+    req.params.id,
+    {
+      name,
+      description,
+      target: target || { type: 'quran', scope: 'full' },
+      schedule: schedule || {},
+      updatedAt: new Date()
+    },
+    { new: true }
+  );
+  if (!group) return res.status(404).json({ message: 'Not found' });
+  res.json(group);
+});
+
+app.delete('/api/reading-groups/:id', authRequired, adminRequired, async (req, res) => {
+  const group = await ReadingGroup.findByIdAndDelete(req.params.id);
+  if (!group) return res.status(404).json({ message: 'Not found' });
+  // Also delete related data
+  await GroupMember.deleteMany({ groupId: req.params.id });
+  await GroupProgress.deleteMany({ groupId: req.params.id });
+  await GroupMessage.deleteMany({ groupId: req.params.id });
+  res.json({ success: true });
 });
 
 app.post('/api/reading-groups/:id/assign', authRequired, async (req, res) => {
@@ -627,6 +655,33 @@ app.get('/api/events/:id/registrations', authRequired, adminRequired, async (req
   res.json(regs);
 });
 
+app.put('/api/events/:id', authRequired, adminRequired, async (req, res) => {
+  const { title, startsAt, endsAt, location, description } = req.body || {};
+  if (!title || !startsAt) return res.status(400).json({ message: 'title and startsAt required' });
+  const event = await Event.findByIdAndUpdate(
+    req.params.id,
+    {
+      title,
+      startsAt: new Date(startsAt),
+      endsAt: endsAt ? new Date(endsAt) : undefined,
+      location,
+      description,
+      updatedAt: new Date()
+    },
+    { new: true }
+  );
+  if (!event) return res.status(404).json({ message: 'Not found' });
+  res.json(event);
+});
+
+app.delete('/api/events/:id', authRequired, adminRequired, async (req, res) => {
+  const event = await Event.findByIdAndDelete(req.params.id);
+  if (!event) return res.status(404).json({ message: 'Not found' });
+  // Also delete related registrations
+  await Registration.deleteMany({ eventId: req.params.id });
+  res.json({ success: true });
+});
+
 // Admin moderation
 app.get('/api/admin/dashboard', authRequired, adminRequired, async (req, res) => {
   const [pendingComments, groups, events] = await Promise.all([
@@ -635,6 +690,16 @@ app.get('/api/admin/dashboard', authRequired, adminRequired, async (req, res) =>
     Event.countDocuments({}),
   ]);
   res.json({ pendingComments, groups, events });
+});
+
+app.get('/api/admin/events', authRequired, adminRequired, async (req, res) => {
+  const events = await Event.find().sort({ startsAt: -1 }).limit(100);
+  res.json(events);
+});
+
+app.get('/api/admin/reading-groups', authRequired, adminRequired, async (req, res) => {
+  const groups = await ReadingGroup.find().sort({ createdAt: -1 }).limit(100);
+  res.json(groups);
 });
 
 app.post('/api/admin/comments/:id/approve', authRequired, adminRequired, async (req, res) => {
