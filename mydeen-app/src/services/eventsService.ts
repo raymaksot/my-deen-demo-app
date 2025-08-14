@@ -1,6 +1,6 @@
 import { apiDelete, apiGet, apiPost } from './api';
 
-export interface EventItem { _id: string; title: string; startsAt: string; endsAt?: string; location?: string; description?: string; registrationsCount?: number }
+export interface EventItem { _id: string; title: string; startsAt: string; endsAt?: string; location?: string; description?: string; registrationsCount?: number; registered?: boolean }
 
 export const eventsService = {
   list(): Promise<EventItem[]> { return apiGet('/api/events'); },
