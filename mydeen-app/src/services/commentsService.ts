@@ -9,6 +9,7 @@ export interface CommentDto {
 	parentId: string;
 	text: string;
 	likesCount: number;
+	liked?: boolean;
 	createdAt: string;
 	updatedAt?: string;
 }
