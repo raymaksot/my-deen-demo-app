@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { setThemeMode } from '@/store/preferencesSlice';
 import { logout } from '@/store/authSlice';
@@ -21,6 +22,7 @@ import { logout } from '@/store/authSlice';
  */
 export default function ProfileScreen() {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   const user = useAppSelector((s) => s.auth.user);
   const prefs = useAppSelector((s) => s.preferences);
   const dispatch = useAppDispatch();
@@ -37,7 +39,7 @@ export default function ProfileScreen() {
         style={styles.hero}
         resizeMode="cover"
       >
-        <Text style={styles.heroTitle}>Profile</Text>
+        <Text style={styles.heroTitle}>{t('profile')}</Text>
       </ImageBackground>
       {/* User card */}
       <View style={styles.card}>

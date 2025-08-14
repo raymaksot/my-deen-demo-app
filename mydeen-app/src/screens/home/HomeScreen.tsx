@@ -135,7 +135,7 @@ export default function HomeScreen() {
                 {/* Next prayer card */}
                 <View style={styles.nextPrayerCard}>
                     <View>
-                        <Text style={{ color: '#fff', fontSize: 12 }}>Next prayer is Dhuhr</Text>
+                        <Text style={{ color: '#fff', fontSize: 12 }}>{t('nextPrayerIs')} Dhuhr</Text>
                         <Text style={{ color: '#fff', fontSize: 24, fontWeight: '700' }}>{times ? times.dhuhr : '--:--'} {times ? (new Date().getHours() >= 12 ? 'PM' : 'AM') : ''}</Text>
                     </View>
                     <TouchableOpacity
