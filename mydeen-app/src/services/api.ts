@@ -38,6 +38,11 @@ export async function apiPost<T = any>(url: string, body?: any, config?: any): P
 	return data;
 }
 
+export async function apiPut<T = any>(url: string, body?: any, config?: any): Promise<T> {
+	const { data } = await api.put<T>(url, body, config);
+	return data;
+}
+
 export async function apiDelete<T = any>(url: string, config?: any): Promise<T> {
 	const { data } = await api.delete<T>(url, config);
 	return data;
