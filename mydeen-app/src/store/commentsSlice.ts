@@ -54,6 +54,13 @@ export const unlikeComment = createAsyncThunk('comments/unlike', async (id: stri
 	return { id, ...res } as { id: string; liked: boolean; likesCount: number };
 });
 
+export const toggleLikeComment = createAsyncThunk('comments/toggleLike', async (payload: { id: string; currentlyLiked: boolean }) => {
+	const res = payload.currentlyLiked 
+		? await commentsService.unlike(payload.id)
+		: await commentsService.like(payload.id);
+	return { id: payload.id, ...res } as { id: string; liked: boolean; likesCount: number };
+});
+
 const slice = createSlice({
 	name: 'comments',
 	initialState,
@@ -113,6 +120,7 @@ const slice = createSlice({
 					const idx = state.byParent[k].items.findIndex((x) => x._id === action.payload.id);
 					if (idx >= 0) {
 						state.byParent[k].items[idx].likesCount = action.payload.likesCount;
+						state.byParent[k].items[idx].liked = action.payload.liked;
 						break;
 					}
 				}
@@ -122,6 +130,17 @@ const slice = createSlice({
 					const idx = state.byParent[k].items.findIndex((x) => x._id === action.payload.id);
 					if (idx >= 0) {
 						state.byParent[k].items[idx].likesCount = action.payload.likesCount;
+						state.byParent[k].items[idx].liked = action.payload.liked;
+						break;
+					}
+				}
+			})
+			.addCase(toggleLikeComment.fulfilled, (state, action) => {
+				for (const k of Object.keys(state.byParent)) {
+					const idx = state.byParent[k].items.findIndex((x) => x._id === action.payload.id);
+					if (idx >= 0) {
+						state.byParent[k].items[idx].likesCount = action.payload.likesCount;
+						state.byParent[k].items[idx].liked = action.payload.liked;
 						break;
 					}
 				}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { CommentDto } from '@/services/commentsService';
-import { createComment, deleteComment, fetchComments, likeComment, unlikeComment, updateComment } from '@/store/commentsSlice';
+import { createComment, deleteComment, fetchComments, toggleLikeComment, updateComment } from '@/store/commentsSlice';
 
 export function CommentsThread(props: { parentType: 'article' | 'qaAnswer'; parentId: string; canEdit?: (c: CommentDto) => boolean }) {
 	const { parentType, parentId, canEdit } = props;
@@ -35,11 +35,11 @@ export function CommentsThread(props: { parentType: 'article' | 'qaAnswer'; pare
 				<Text style={styles.meta}>{new Date(item.createdAt).toLocaleString()}</Text>
 				<Text style={styles.text}>{item.text}</Text>
 				<View style={styles.row}>
-					<TouchableOpacity onPress={() => dispatch(likeComment(item._id) as any)} style={styles.btnSm}>
-						<Text>👍 {item.likesCount}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={() => dispatch(unlikeComment(item._id) as any)} style={styles.btnSm}>
-						<Text>↩︎</Text>
+					<TouchableOpacity 
+						onPress={() => dispatch(toggleLikeComment({ id: item._id, currentlyLiked: !!item.liked }) as any)} 
+						style={styles.btnSm}
+					>
+						<Text style={{ color: item.liked ? '#ef4444' : '#6b7280' }}>❤️ {item.likesCount}</Text>
 					</TouchableOpacity>
 					{editable && (
 						<>
