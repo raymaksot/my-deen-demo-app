@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, View } from 'react-native';
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import * as Notifications from 'expo-notifications';
@@ -12,7 +12,8 @@ import { useAppSelector } from '@/store/hooks';
 import { initAuthFromStorage } from '@/store/authSlice';
 import { registerBackgroundTasks } from '@/services/background';
 import { configureNotificationChannel, registerDeviceToken } from '@/notifications/registerDeviceToken';
-import { ENV } from '@/config/env'; 
+import { ENV } from '@/config/env';
+import { NetworkStatusBanner } from '@/components/NetworkStatusBanner'; 
 
 
 function AppInner() {
@@ -24,7 +25,7 @@ function AppInner() {
 		store.dispatch(initAuthFromStorage());
 		(async () => {
 			if (Device.isDevice) {
-				await registerDeviceTokenWithBackend();
+				await registerDeviceToken(ENV.API_BASE_URL || '');
 			}
 			await registerBackgroundTasks();
 		})();
@@ -35,10 +36,13 @@ function AppInner() {
 	}, [locale]);
 
 	return (
-		<NavigationContainer theme={navTheme}>
-			<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
-			<RootNavigator />
-		</NavigationContainer>
+		<View style={{ flex: 1 }}>
+			<NavigationContainer theme={navTheme}>
+				<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
+				<NetworkStatusBanner />
+				<RootNavigator />
+			</NavigationContainer>
+		</View>
 	);
 }
 
