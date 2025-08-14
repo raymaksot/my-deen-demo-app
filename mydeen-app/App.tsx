@@ -5,15 +5,24 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { Provider } from 'react-redux';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import { store } from '@/store';
+import { store, bootstrapPreferences } from '@/store';
 import RootNavigator from '@/navigation/RootNavigator';
 import i18n from './src/i18n';
 import { useAppSelector } from '@/store/hooks';
 import { initAuthFromStorage } from '@/store/authSlice';
 import { registerBackgroundTasks } from '@/services/background';
 import { configureNotificationChannel, registerDeviceToken } from '@/notifications/registerDeviceToken';
+import { ThemeProvider } from '@/theme/ThemeContext';
 import { ENV } from '@/config/env'; 
 
+async function registerDeviceTokenWithBackend() {
+	try {
+		await registerDeviceToken();
+		await configureNotificationChannel();
+	} catch (error) {
+		console.warn('Failed to register device token:', error);
+	}
+}
 
 function AppInner() {
 	const themeMode = useAppSelector((s) => s.preferences.themeMode);
@@ -21,6 +30,8 @@ function AppInner() {
 	const navTheme = themeMode === 'dark' ? DarkTheme : DefaultTheme;
 
 	useEffect(() => {
+		// Initialize store with persisted preferences
+		bootstrapPreferences();
 		store.dispatch(initAuthFromStorage());
 		(async () => {
 			if (Device.isDevice) {
@@ -35,10 +46,12 @@ function AppInner() {
 	}, [locale]);
 
 	return (
-		<NavigationContainer theme={navTheme}>
-			<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
-			<RootNavigator />
-		</NavigationContainer>
+		<ThemeProvider>
+			<NavigationContainer theme={navTheme}>
+				<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
+				<RootNavigator />
+			</NavigationContainer>
+		</ThemeProvider>
 	);
 }
 

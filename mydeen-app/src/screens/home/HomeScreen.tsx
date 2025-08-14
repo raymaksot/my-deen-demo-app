@@ -13,7 +13,7 @@ import { prayerService, PrayerTimesResponse } from '@/services/prayerService';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '@/store/hooks';
 import { schedulePrayerNotifications } from '@/services/athan';
-import { useThemeColors } from '@/theme/theme';
+import { useTheme } from '@/theme/theme';
 
 export default function HomeScreen() {
 	const navigation = useNavigation<any>();
@@ -23,9 +23,9 @@ export default function HomeScreen() {
 	const calcMethod = useAppSelector((s) => s.preferences.prayer.calculationMethod);
 	const [syncing, setSyncing] = useState(false);
 
-	// Pull colours from theme.  We'll build styles from these colours.
-	const colors = useThemeColors();
-	const styles = React.useMemo(() => createStyles(colors), [colors]);
+	// Pull colors and font scale from theme. We'll build styles from these values.
+	const { colors, fontScale, highContrast } = useTheme();
+	const styles = React.useMemo(() => createStyles(colors, fontScale), [colors, fontScale]);
 
 	useEffect(() => {
 		(async () => {
@@ -213,11 +213,11 @@ export default function HomeScreen() {
     );
 }
 
-// Factory to create dynamic styles for the home screen. Colours are
-// derived from the active theme.  Various UI elements such as the
+// Factory to create dynamic styles for the home screen. Colors and font sizes are
+// derived from the active theme. Various UI elements such as the
 // hero overlay, prayer card and button backgrounds change when
-// switching between light and dark modes.
-const createStyles = (colors: { [key: string]: string }) =>
+// switching between light and dark modes, and text scales with font preferences.
+const createStyles = (colors: { [key: string]: string }, fontScale: number) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: colors.background },
     hero: {
@@ -246,7 +246,7 @@ const createStyles = (colors: { [key: string]: string }) =>
       borderRadius: 20,
     },
     rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    sectionTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
-    seeAll: { color: colors.primary, fontSize: 14, fontWeight: '600' },
-    categoryLabel: { fontSize: 12, color: colors.primary, marginBottom: 2 },
+    sectionTitle: { fontSize: 18 * fontScale, fontWeight: '700', color: colors.text },
+    seeAll: { color: colors.primary, fontSize: 14 * fontScale, fontWeight: '600' },
+    categoryLabel: { fontSize: 12 * fontScale, color: colors.primary, marginBottom: 2 },
   });
