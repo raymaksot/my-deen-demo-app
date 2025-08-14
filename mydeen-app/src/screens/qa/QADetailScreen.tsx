@@ -22,6 +22,12 @@ export default function QADetailScreen() {
 		(async () => {
 			const res = await qaService.get(id);
 			setItem(res);
+			// Initialize like status (will be updated when user first interacts)
+			if (res.answer) {
+				// We start with default values, which will be corrected on first interaction
+				setAnswerLikes(0);
+				setLiked(false);
+			}
 		})();
 	}, [id]);
 
@@ -59,18 +65,20 @@ export default function QADetailScreen() {
 			<Text style={styles.q}>{item?.question}</Text>
 			<Text style={styles.section}>Answer</Text>
 			<Text>{item?.answer || 'Not answered yet'}</Text>
-			<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-				<TouchableOpacity 
-					onPress={handleLike} 
-					style={[styles.likeBtn, liked && styles.likeBtnActive]}
-					disabled={likeLoading}
-				>
-					<Text style={[styles.likeBtnText, liked && styles.likeBtnTextActive]}>
-						{likeLoading ? 'Loading...' : liked ? 'Liked' : 'Like answer'}
-					</Text>
-				</TouchableOpacity>
-				<Text>{answerLikes} likes</Text>
-			</View>
+			{item?.answer && (
+				<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+					<TouchableOpacity 
+						onPress={handleLike} 
+						style={[styles.likeBtn, liked && styles.likeBtnActive]}
+						disabled={likeLoading}
+					>
+						<Text style={[styles.likeBtnText, liked && styles.likeBtnTextActive]}>
+							{likeLoading ? 'Loading...' : liked ? 'Liked' : 'Like answer'}
+						</Text>
+					</TouchableOpacity>
+					<Text>{answerLikes} likes</Text>
+				</View>
+			)}
 			{canAnswer && (
 				<View style={{ marginTop: 12 }}>
 					<TextInput value={answer} onChangeText={setAnswer} placeholder="Write your answer" style={styles.input} multiline />
