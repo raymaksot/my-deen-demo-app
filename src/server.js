@@ -709,6 +709,33 @@ app.get('/api/admin/reading-groups', authRequired, adminRequired, async (req, re
   res.json(groups);
 });
 
+app.get('/api/admin/comments/pending', authRequired, adminRequired, async (req, res) => {
+  const comments = await Comment.find({ status: 'pending' }).sort({ createdAt: -1 }).limit(100);
+  // Add user information for each comment
+  const commentsWithUsers = await Promise.all(comments.map(async (comment) => {
+    const user = await User.findById(comment.userId);
+    return {
+      ...comment.toObject(),
+      user: user ? { name: user.name, email: user.email } : null
+    };
+  }));
+  res.json(commentsWithUsers);
+});
+
+// Test endpoint to create pending comments for demo purposes
+app.post('/api/admin/comments/create-pending', authRequired, adminRequired, async (req, res) => {
+  const { parentType = 'article', parentId = 'test123', text = 'This is a test pending comment' } = req.body || {};
+  const comment = await Comment.create({ 
+    parentType, 
+    parentId, 
+    text, 
+    userId: req.user.sub, 
+    likesCount: 0, 
+    status: 'pending' 
+  });
+  res.json(comment);
+});
+
 app.post('/api/admin/comments/:id/approve', authRequired, adminRequired, async (req, res) => {
   const c = await Comment.findById(req.params.id);
   if (!c) return res.status(404).json({ message: 'Not found' });
