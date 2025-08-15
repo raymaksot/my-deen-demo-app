@@ -26,7 +26,4 @@ export const qaService = {
 	async toggleLikeAnswer(answerId: string): Promise<{ liked: boolean; likesCount: number }> {
 		return apiPost(`/api/likes/toggle`, { parentType: 'qaAnswer', parentId: answerId });
 	},
-	async getLikeStatus(answerId: string): Promise<{ liked: boolean; likesCount: number }> {
-		return apiPost(`/api/likes/status`, { parentType: 'qaAnswer', parentId: answerId });
-	},
 };

@@ -23,19 +23,9 @@ export default function QADetailScreen() {
 			const res = await qaService.get(id);
 			setItem(res);
 			
-			// Fetch like status for the answer if it exists
-			if (res._id) {
-				try {
-					const likeStatus = await qaService.getLikeStatus(res._id);
-					setAnswerLikes(likeStatus.likesCount);
-					setLiked(likeStatus.liked);
-				} catch (error) {
-					// If like status fails, just use defaults
-					console.warn('Failed to fetch like status:', error);
-					setAnswerLikes(0);
-					setLiked(false);
-				}
-			}
+			// Reset like state - will be populated when user interacts or if we fetch it separately
+			setAnswerLikes(0);
+			setLiked(false);
 		})();
 	}, [id]);
 

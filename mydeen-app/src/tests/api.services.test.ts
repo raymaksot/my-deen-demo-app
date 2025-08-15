@@ -18,6 +18,5 @@ describe('Service shapes', () => {
     expect(typeof qaService.get).toBe('function');
     expect(typeof qaService.answer).toBe('function');
     expect(typeof qaService.toggleLikeAnswer).toBe('function');
-    expect(typeof qaService.getLikeStatus).toBe('function');
   });
 });
