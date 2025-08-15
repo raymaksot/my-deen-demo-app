@@ -662,6 +662,11 @@ app.get('/api/events/:id/registrations', authRequired, adminRequired, async (req
   res.json(regs);
 });
 
+app.get('/api/events/:id/registrations/me', authRequired, async (req, res) => {
+  const registration = await Registration.findOne({ eventId: req.params.id, userId: req.user.sub });
+  res.json({ registered: !!registration });
+});
+
 app.put('/api/events/:id', authRequired, adminRequired, async (req, res) => {
   const { title, startsAt, endsAt, location, description } = req.body || {};
   if (!title || !startsAt) return res.status(400).json({ message: 'title and startsAt required' });
