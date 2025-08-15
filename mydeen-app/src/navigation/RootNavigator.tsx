@@ -9,6 +9,7 @@ import HomeScreen from '@/screens/home/HomeScreen';
 import QuranScreen from '@/screens/quran/QuranScreen';
 import HadithScreen from '@/screens/hadith/HadithScreen';
 import DuasScreen from '@/screens/duas/DuasScreen';
+import TasbeehCounterScreen from '@/screens/duas/TasbeehCounterScreen';
 import PlacesScreen from '@/screens/places/PlacesScreen';
 import QAScreen from '@/screens/qa/QAScreen';
 import SettingsScreen from '@/screens/settings/SettingsScreen';
@@ -90,6 +91,7 @@ export default function RootNavigator() {
                     <Stack.Screen name="SurahDetail" component={SurahDetailScreen} />
                     <Stack.Screen name="VerseDetail" component={VerseDetailScreen} />
                     <Stack.Screen name="QADetail" component={QADetailScreen} />
+                    <Stack.Screen name="TasbeehCounter" component={TasbeehCounterScreen} />
                     <Stack.Screen name="GroupDetail" component={GroupDetailScreen} />
                     <Stack.Screen name="EventDetail" component={EventDetailScreen} />
                     <Stack.Screen name="MyEvents" component={MyEventsScreen} />
