@@ -6,6 +6,13 @@ export interface PrayerPreferences {
 	calculationMethod: string; // e.g., 'MWL', 'ISNA', 'Makkah'
 	highLatitudeRule: string; // 'MidNight', 'Seventh', 'AngleBased'
 	timezone?: string;
+	notifications: {
+		fajr: boolean;
+		dhuhr: boolean;
+		asr: boolean;
+		maghrib: boolean;
+		isha: boolean;
+	};
 }
 
 export interface PreferencesState {
@@ -20,6 +27,13 @@ const initialState: PreferencesState = {
 	prayer: {
 		calculationMethod: 'MWL',
 		highLatitudeRule: 'MidNight',
+		notifications: {
+			fajr: true,
+			dhuhr: true,
+			asr: true,
+			maghrib: true,
+			isha: true,
+		},
 	},
 };
 

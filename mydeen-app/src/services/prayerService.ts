@@ -20,3 +20,8 @@ export const prayerService = {
 		return res.data as PrayerTimesResponse[];
 	},
 };
+
+// Helper function for getting prayer times with default coordinates
+export async function getPrayerTimes(lat = 21.3891, lng = 39.8579, method?: string): Promise<PrayerTimesResponse> {
+	return prayerService.getTodayTimes(lat, lng, method);
+}

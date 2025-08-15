@@ -13,6 +13,7 @@ import PlacesScreen from '@/screens/places/PlacesScreen';
 import QAScreen from '@/screens/qa/QAScreen';
 import SettingsScreen from '@/screens/settings/SettingsScreen';
 import PrayerTimesScreen from '@/screens/prayer/PrayerTimesScreen';
+import PrayerSettingsScreen from '@/screens/prayer/PrayerSettingsScreen';
 import HijriCalendarScreen from '@/screens/calendar/HijriCalendarScreen';
 import ZakatCalculatorScreen from '@/screens/zakat/ZakatCalculatorScreen';
 import ArticleDetailScreen from '@/screens/articles/ArticleDetailScreen';
@@ -84,6 +85,7 @@ export default function RootNavigator() {
                 <>
                     <Stack.Screen name="Main" component={MainTabs} />
                     <Stack.Screen name="PrayerTimes" component={PrayerTimesScreen} />
+                    <Stack.Screen name="PrayerSettings" component={PrayerSettingsScreen} options={{ title: 'Prayer Settings' }} />
                     <Stack.Screen name="HijriCalendar" component={HijriCalendarScreen} />
                     <Stack.Screen name="Zakat" component={ZakatCalculatorScreen} />
                     <Stack.Screen name="ArticleDetail" component={ArticleDetailScreen} />
