@@ -29,6 +29,12 @@ export default function GroupDetailScreen() {
 
 	// Check if current user is group owner
 	const isOwner = members.find(m => m.userId === user?.sub)?.role === 'owner';
+	
+	// Check current user membership status
+	const currentMember = members.find(m => m.userId === user?.sub);
+	const isMember = !!currentMember;
+	const canJoin = !isMember;
+	const canLeave = isMember && !isOwner;
 
 	useEffect(() => {
 		(async () => {
@@ -121,6 +127,38 @@ export default function GroupDetailScreen() {
 		}
 	}
 
+	async function joinGroup() {
+		try {
+			await groupsService.join(id);
+			// Add current user to members list
+			if (user?.sub) {
+				const newMember: Member = { userId: user.sub, role: 'member' };
+				setMembers([...members, newMember]);
+			}
+		} catch (error) {
+			// If network fails, queue the mutation for offline sync
+			await enqueue('joinGroup', { groupId: id });
+			// Optimistically update UI
+			if (user?.sub) {
+				const newMember: Member = { userId: user.sub, role: 'member' };
+				setMembers([...members, newMember]);
+			}
+		}
+	}
+
+	async function leaveGroup() {
+		try {
+			await groupsService.leave(id);
+			// Remove current user from members list
+			setMembers(members.filter(m => m.userId !== user?.sub));
+		} catch (error) {
+			// If network fails, queue the mutation for offline sync
+			await enqueue('leaveGroup', { groupId: id });
+			// Optimistically update UI
+			setMembers(members.filter(m => m.userId !== user?.sub));
+		}
+	}
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.title}>{group?.name}</Text>
@@ -128,6 +166,18 @@ export default function GroupDetailScreen() {
 
 			<Text style={styles.section}>Members</Text>
 			<FlatList data={members} keyExtractor={(i) => i.userId} renderItem={({ item }) => <Text>- {item.userId} {item.role === 'owner' ? '(Owner)' : ''}</Text>} />
+
+			{/* Join/Leave buttons */}
+			{canJoin && (
+				<TouchableOpacity onPress={joinGroup} style={[styles.primary, { marginTop: 12 }]}>
+					<Text style={styles.primaryText}>Join</Text>
+				</TouchableOpacity>
+			)}
+			{canLeave && (
+				<TouchableOpacity onPress={leaveGroup} style={[styles.secondary, { marginTop: 12 }]}>
+					<Text>Leave</Text>
+				</TouchableOpacity>
+			)}
 
 			<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
 				<Text style={styles.section}>Progress</Text>
