@@ -25,7 +25,10 @@ export function useContentNotifications() {
       return;
     }
     
-    await Notifications.scheduleNotificationAsync({ content: { title: payload.title, body: payload.body, data: payload.data }, trigger: { date: when } });
+    await Notifications.scheduleNotificationAsync({ 
+      content: { title: payload.title, body: payload.body, data: payload.data }, 
+      trigger: { type: 'date', date: when } 
+    });
   }
 
   return { scheduleLocal };

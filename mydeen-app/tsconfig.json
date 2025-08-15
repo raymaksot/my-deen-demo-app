@@ -6,16 +6,17 @@
     ],
     "jsx": "react-jsx",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "allowJs": true,
     "noEmit": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "types": [
       "react",
-      "react-native",
-      "react-native-web"
+      "react-native"
     ],
     "baseUrl": ".",
     "paths": {

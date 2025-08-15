@@ -5,6 +5,8 @@ export default {
     version: "1.0.0",
     orientation: "portrait",
     userInterfaceStyle: "automatic",
+    platforms: ["ios", "android"],
+    sdkVersion: "53.0.20",
     assetBundlePatterns: [
       "**/*"
     ],
