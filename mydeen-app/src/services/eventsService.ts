@@ -9,4 +9,5 @@ export const eventsService = {
   create(input: Partial<EventItem>): Promise<EventItem> { return apiPost('/api/events', input); },
   register(id: string): Promise<{ registered: boolean; registrationsCount: number }> { return apiPost(`/api/events/${id}/register`); },
   cancel(id: string): Promise<{ registered: boolean; registrationsCount: number }> { return apiDelete(`/api/events/${id}/register`); },
+  checkRegistration(id: string): Promise<{ registered: boolean }> { return apiGet(`/api/events/${id}/registrations/me`); },
 };

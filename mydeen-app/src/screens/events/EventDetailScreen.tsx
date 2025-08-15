@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { apiDelete, apiGet, apiPost } from '@/services/api';
+import { eventsService } from '@/services/eventsService';
 import * as Notifications from 'expo-notifications';
 import { useRoute } from '@react-navigation/native';
 import { appStorage } from '@/utils/cache';
@@ -35,11 +36,9 @@ export default function EventDetailScreen() {
 			setItem(res);
 			setCount(res.registrationsCount ?? 0);
 			
-			// Check if there's an existing notification for this event
-			const notificationId = await appStorage.get(`event-notification-${id}`);
-			if (notificationId) {
-				setRegistered(true);
-			}
+			// Check registration status from server
+			const registrationStatus = await eventsService.checkRegistration(id);
+			setRegistered(registrationStatus.registered);
 		})();
 	}, [id]);
 

@@ -75,4 +75,36 @@ describe('Events', () => {
     expect(myEvents.body.length).toBeGreaterThanOrEqual(1);
     expect(myEvents.body.some(event => event._id === id)).toBe(true);
   });
+
+  it('should check user registration status', async () => {
+    const admin = sign({ sub: 'admin', role: 'admin' });
+    const user = sign({ sub: 'u4', role: 'user' });
+    const start = new Date(Date.now() + 3600 * 1000).toISOString();
+    const ev = await request(app).post('/api/events').set('Authorization', `Bearer ${admin}`).send({ title: 'Registration Test Event', startsAt: start });
+    expect(ev.status).toBe(200);
+    const id = ev.body._id;
+    
+    // Initially should not be registered
+    const checkBefore = await request(app).get(`/api/events/${id}/registrations/me`).set('Authorization', `Bearer ${user}`);
+    expect(checkBefore.status).toBe(200);
+    expect(checkBefore.body.registered).toBe(false);
+    
+    // Register user for event
+    const rsvp = await request(app).post(`/api/events/${id}/register`).set('Authorization', `Bearer ${user}`);
+    expect(rsvp.status).toBe(200);
+    
+    // Now should be registered
+    const checkAfter = await request(app).get(`/api/events/${id}/registrations/me`).set('Authorization', `Bearer ${user}`);
+    expect(checkAfter.status).toBe(200);
+    expect(checkAfter.body.registered).toBe(true);
+    
+    // Cancel registration
+    const cancel = await request(app).delete(`/api/events/${id}/register`).set('Authorization', `Bearer ${user}`);
+    expect(cancel.status).toBe(200);
+    
+    // Should not be registered again
+    const checkFinal = await request(app).get(`/api/events/${id}/registrations/me`).set('Authorization', `Bearer ${user}`);
+    expect(checkFinal.status).toBe(200);
+    expect(checkFinal.body.registered).toBe(false);
+  });
 });
