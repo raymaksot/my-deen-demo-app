@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
 import { prayerService, PrayerTimesResponse } from '@/services/prayerService';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +19,7 @@ import DailyContent from '@/components/DailyContent';
 
 export default function HomeScreen() {
 	const navigation = useNavigation<any>();
+	const { t } = useTranslation();
 	const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
 	const [times, setTimes] = useState<PrayerTimesResponse | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export default function HomeScreen() {
 		(async () => {
 			const { status } = await Location.requestForegroundPermissionsAsync();
 			if (status !== 'granted') {
-				setError('Location permission denied');
+				setError(t('locationPermissionDenied'));
 				return;
 			}
 			const loc = await Location.getCurrentPositionAsync({});
@@ -130,14 +132,14 @@ export default function HomeScreen() {
                 {/* Next prayer card */}
                 <View style={styles.nextPrayerCard}>
                     <View>
-                        <Text style={{ color: '#fff', fontSize: 12 }}>Next prayer is Dhuhr</Text>
+                        <Text style={{ color: '#fff', fontSize: 12 }}>{t('nextPrayerIs')} {t('dhuhr')}</Text>
                         <Text style={{ color: '#fff', fontSize: 24, fontWeight: '700' }}>{times ? times.dhuhr : '--:--'} {times ? (new Date().getHours() >= 12 ? 'PM' : 'AM') : ''}</Text>
                     </View>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('FindQibla')}
                         style={styles.findQiblaBtn}
                     >
-                        <Text style={{ color: colors.background === '#0B1220' ? '#fff' : '#0E7490', fontSize: 12, fontWeight: '600' }}>Find Qibla</Text>
+                        <Text style={{ color: colors.background === '#0B1220' ? '#fff' : '#0E7490', fontSize: 12, fontWeight: '600' }}>{t('findQibla')}</Text>
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
@@ -145,11 +147,11 @@ export default function HomeScreen() {
             {/* Daily Content Section */}
             <DailyContent />
 
-            {/* Featured Cult Section */}
+            {/* Featured Content Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Featured Cult</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Videos')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('featuredContent')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Videos')}><Text style={styles.seeAll}>{t('seeAll')}</Text></TouchableOpacity>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
                     {videos.map((v) => (
@@ -171,11 +173,11 @@ export default function HomeScreen() {
                 </ScrollView>
             </View>
 
-            {/* Latest Article Section */}
+            {/* Latest Articles Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 32 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Latest Article</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Articles')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('latestArticles')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Articles')}><Text style={styles.seeAll}>{t('seeAll')}</Text></TouchableOpacity>
                 </View>
                 {articles.map((a) => (
                     <TouchableOpacity
@@ -196,8 +198,8 @@ export default function HomeScreen() {
             {/* Nearest Mosque Section */}
             <View style={{ paddingHorizontal: 16, marginTop: 32, marginBottom: 24 }}>
                 <View style={styles.rowBetween}>
-                    <Text style={styles.sectionTitle}>Nearest Mosque</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('FindMosque')}><Text style={styles.seeAll}>See All</Text></TouchableOpacity>
+                    <Text style={styles.sectionTitle}>{t('nearestMosque')}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('FindMosque')}><Text style={styles.seeAll}>{t('seeAll')}</Text></TouchableOpacity>
                 </View>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
                     {mosquesList.map((m) => (

@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { quranService, DailyAyah } from '@/services/quranService';
 import { hadithService, Hadith } from '@/services/hadithService';
 import { useThemeColors } from '@/theme/theme';
@@ -19,6 +20,7 @@ export default function DailyContent({ style }: DailyContentProps) {
   const [dailyHadith, setDailyHadith] = useState<Hadith | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const colors = useThemeColors();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
@@ -50,7 +52,7 @@ export default function DailyContent({ style }: DailyContentProps) {
     return (
       <View style={[styles.container, style]}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading daily content...</Text>
+        <Text style={styles.loadingText}>{t('loading')}</Text>
       </View>
     );
   }
@@ -71,7 +73,7 @@ export default function DailyContent({ style }: DailyContentProps) {
       {dailyAyah && (
         <View style={styles.contentCard}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Daily Ayah</Text>
+            <Text style={styles.cardTitle}>{t('dailyAyah')}</Text>
             <Text style={styles.surahInfo}>
               {dailyAyah.surah.englishName} ({dailyAyah.surah.number}:{dailyAyah.number})
             </Text>
@@ -92,7 +94,7 @@ export default function DailyContent({ style }: DailyContentProps) {
       {dailyHadith && (
         <View style={styles.contentCard}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Daily Hadith</Text>
+            <Text style={styles.cardTitle}>{t('dailyHadith')}</Text>
             <Text style={styles.surahInfo}>
               {dailyHadith.collection}
               {dailyHadith.bookNumber && ` • Book ${dailyHadith.bookNumber}`}

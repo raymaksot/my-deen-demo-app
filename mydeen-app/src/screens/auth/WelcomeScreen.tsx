@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import * as Google from 'expo-auth-session/providers/google';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { googleLogin } from '@/store/authSlice';
@@ -26,6 +27,7 @@ import { PrimaryButton, SecondaryButton } from '@/components/common';
 export default function WelcomeScreen() {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const status = useAppSelector((s) => s.auth.status);
   const [request, response, promptAsync] = Google.useAuthRequest({ webClientId: ENV.googleWebClientId });
   // Access current colour palette based on theme mode.
@@ -48,15 +50,14 @@ export default function WelcomeScreen() {
       <View style={[styles.overlay, { backgroundColor: colors.background === '#0B1220' ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.4)' }]} />
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.text }]}>
-          Welcome to Nice Muslim
+          {t('welcomeTo')}
         </Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
-          Lorem ipsum dolor sit amet consectetur. Ultrices pellentesque ut rutrum nibh diam. Ullamcorper
-          adipiscing ut iaculis amet urna id integer libero.
+          {t('welcomeDescription')}
         </Text>
         {/* Sign up with Google */}
         <SecondaryButton
-          title="Sign Up with Google"
+          title={t('signUpWithGoogle')}
           onPress={() => promptAsync()}
           style={[
             styles.socialBtn, 
@@ -69,7 +70,7 @@ export default function WelcomeScreen() {
         />
         {/* Sign up with Facebook */}
         <SecondaryButton
-          title="Sign Up with Facebook"
+          title={t('signUpWithFacebook')}
           onPress={() => {}}
           style={[
             styles.socialBtn, 
@@ -83,12 +84,12 @@ export default function WelcomeScreen() {
         {/* Divider */}
         <View style={styles.dividerRow}>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <Text style={{ color: colors.muted, marginHorizontal: 8 }}>or</Text>
+          <Text style={{ color: colors.muted, marginHorizontal: 8 }}>{t('or')}</Text>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
         </View>
         {/* Sign in with email */}
         <PrimaryButton
-          title="Sign In with Email"
+          title={t('signInWithEmail')}
           onPress={() => navigation.navigate('Login')}
           loading={status === 'loading'}
           style={[

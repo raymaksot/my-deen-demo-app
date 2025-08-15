@@ -7,7 +7,7 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { store } from '@/store';
 import RootNavigator from '@/navigation/RootNavigator';
-import i18n from './src/i18n';
+import { initializeI18n, changeLanguage } from './src/i18n';
 import { useAppSelector } from '@/store/hooks';
 import { initAuthFromStorage } from '@/store/authSlice';
 import { registerBackgroundTasks } from '@/services/background';
@@ -22,6 +22,9 @@ function AppInner() {
 	const navTheme = themeMode === 'dark' ? DarkTheme : DefaultTheme;
 
 	useEffect(() => {
+		// Initialize i18n with current locale
+		initializeI18n(locale);
+		
 		store.dispatch(initAuthFromStorage());
 		(async () => {
 			if (Device.isDevice) {
@@ -32,7 +35,8 @@ function AppInner() {
 	}, []);
 
 	useEffect(() => {
-		i18n.changeLanguage(locale);
+		// Update language when locale changes
+		changeLanguage(locale);
 	}, [locale]);
 
 	return (
