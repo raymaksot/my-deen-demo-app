@@ -26,6 +26,11 @@ import SurahDetailScreen from '@/screens/quran/SurahDetailScreen';
 import VerseDetailScreen from '@/screens/quran/VerseDetailScreen';
 import QADetailScreen from '@/screens/qa/QADetailScreen';
 import AdminDashboardScreen from '@/screens/admin/AdminDashboardScreen';
+import AdminPendingCommentsScreen from '@/screens/admin/AdminPendingCommentsScreen';
+import AdminEventsScreen from '@/screens/admin/AdminEventsScreen';
+import AdminGroupsScreen from '@/screens/admin/AdminGroupsScreen';
+import AdminEventFormScreen from '@/screens/admin/AdminEventFormScreen';
+import AdminGroupFormScreen from '@/screens/admin/AdminGroupFormScreen';
 import ReadingGroupsScreen from '@/screens/groups/ReadingGroupsScreen';
 import GroupDetailScreen from '@/screens/groups/GroupDetailScreen';
 import EventsScreen from '@/screens/events/EventsScreen';
@@ -101,6 +106,11 @@ export default function RootNavigator() {
                     <Stack.Screen name="QiblaCompass" component={QiblaCompass} />
                     <Stack.Screen name="FindQibla" component={FindQiblaScreen} />
                     {user?.role === 'admin' && <Stack.Screen name="Admin" component={AdminDashboardScreen} />}
+                    {user?.role === 'admin' && <Stack.Screen name="AdminPendingComments" component={AdminPendingCommentsScreen} />}
+                    {user?.role === 'admin' && <Stack.Screen name="AdminEvents" component={AdminEventsScreen} />}
+                    {user?.role === 'admin' && <Stack.Screen name="AdminGroups" component={AdminGroupsScreen} />}
+                    {user?.role === 'admin' && <Stack.Screen name="AdminEventForm" component={AdminEventFormScreen} />}
+                    {user?.role === 'admin' && <Stack.Screen name="AdminGroupForm" component={AdminGroupFormScreen} />}
                     <Stack.Screen name="Terms" component={TermsScreen} />
                     <Stack.Screen name="Privacy" component={PrivacyScreen} />
                     <Stack.Screen name="Settings" component={SettingsScreen} />
