@@ -4,6 +4,7 @@ import { duasService, DuaCategory, Dua } from '@/services/duasService';
 import { Audio } from 'expo-av';
 import { PrimaryButton, Card } from '@/components/common';
 import { useThemeColors } from '@/theme/theme';
+import { useNavigation } from '@react-navigation/native';
 
 export default function DuasScreen() {
 	const [categories, setCategories] = useState<DuaCategory[]>([]);
@@ -12,6 +13,7 @@ export default function DuasScreen() {
 	const [counter, setCounter] = useState(0);
 	const [sound, setSound] = useState<Audio.Sound | null>(null);
 	const colors = useThemeColors();
+	const navigation = useNavigation<any>();
 
 	useEffect(() => {
 		(async () => {
@@ -44,6 +46,16 @@ export default function DuasScreen() {
 
 	return (
 		<View style={styles.container}>
+			{/* Tasbeeh Counter Button */}
+			<View style={styles.tasbeehButtonContainer}>
+				<PrimaryButton
+					title="Tasbeeh Counter"
+					onPress={() => navigation.navigate('TasbeehCounter')}
+					style={styles.tasbeehButton}
+					textStyle={styles.tasbeehButtonText}
+				/>
+			</View>
+
 			<FlatList
 				data={categories}
 				keyExtractor={(i) => i._id}
@@ -102,6 +114,17 @@ export default function DuasScreen() {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
+	tasbeehButtonContainer: {
+		marginBottom: 16,
+	},
+	tasbeehButton: {
+		backgroundColor: '#2563eb',
+		paddingVertical: 12,
+	},
+	tasbeehButtonText: {
+		fontSize: 16,
+		fontWeight: '600',
+	},
 	chip: { 
 		paddingHorizontal: 12, 
 		paddingVertical: 6, 
