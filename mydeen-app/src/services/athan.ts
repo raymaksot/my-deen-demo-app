@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import dayjs from 'dayjs';
 import { PrayerTimesResponse } from './prayerService';
+import { PrayerPreferences } from '../store/preferencesSlice';
 import { quranService } from './quranService';
 import { hadithService } from './hadithService';
 
@@ -13,15 +14,29 @@ function toFutureDate(timeStr: string): Date | null {
 	return dt.toDate();
 }
 
-export async function schedulePrayerNotifications(times: PrayerTimesResponse) {
-	const mapping: [string, string][] = [
-		['Fajr', times.fajr],
-		['Dhuhr', times.dhuhr],
-		['Asr', times.asr],
-		['Maghrib', times.maghrib],
-		['Isha', times.isha],
+export async function schedulePrayerNotifications(times: PrayerTimesResponse, prefs?: PrayerPreferences) {
+	// Cancel existing prayer notifications first
+	const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
+	const prayerNotifications = scheduledNotifications.filter(
+		notification => notification.content.title?.includes('Athan')
+	);
+	
+	for (const notification of prayerNotifications) {
+		await Notifications.cancelScheduledNotificationAsync(notification.identifier);
+	}
+
+	const mapping: [string, string, keyof PrayerPreferences['notifications']][] = [
+		['Fajr', times.fajr, 'fajr'],
+		['Dhuhr', times.dhuhr, 'dhuhr'],
+		['Asr', times.asr, 'asr'],
+		['Maghrib', times.maghrib, 'maghrib'],
+		['Isha', times.isha, 'isha'],
 	];
-	for (const [name, t] of mapping) {
+	
+	for (const [name, t, prefKey] of mapping) {
+		// Skip if notifications are disabled for this prayer
+		if (prefs?.notifications && !prefs.notifications[prefKey]) continue;
+		
 		const when = toFutureDate(t);
 		if (!when) continue;
 		await Notifications.scheduleNotificationAsync({

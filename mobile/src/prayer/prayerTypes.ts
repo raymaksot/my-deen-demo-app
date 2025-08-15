@@ -12,6 +12,13 @@ export type PrayerPreferences = {
   madhab: keyof typeof Madhab;
   timeZone?: string;
   latitudeAdjustmentMethod?: 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'AngleBased';
+  notifications: {
+    fajr: boolean;
+    dhuhr: boolean;
+    asr: boolean;
+    maghrib: boolean;
+    isha: boolean;
+  };
 };
 
 export const CalculationMethodOptions: { key: keyof typeof CalculationMethod; label: string }[] = [
@@ -27,9 +34,15 @@ export const CalculationMethodOptions: { key: keyof typeof CalculationMethod; la
   { key: 'Singapore', label: 'Singapore' },
   { key: 'Turkey', label: 'Turkey' },
   { key: 'Tehran', label: 'Tehran' },
-} as const;
+];
 
 export const MadhabOptions: { key: keyof typeof Madhab; label: string }[] = [
   { key: 'Shafi', label: 'Shafi / Maliki / Hanbali' },
   { key: 'Hanafi', label: 'Hanafi' },
+];
+
+export const LatitudeAdjustmentMethodOptions: { key: 'MiddleOfTheNight' | 'SeventhOfTheNight' | 'AngleBased'; label: string }[] = [
+  { key: 'MiddleOfTheNight', label: 'Middle of the Night' },
+  { key: 'SeventhOfTheNight', label: 'Seventh of the Night' },
+  { key: 'AngleBased', label: 'Angle Based' },
 ];

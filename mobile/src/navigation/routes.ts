@@ -12,4 +12,5 @@ export enum Routes {
   Zakat = 'Zakat',
   Calendar = 'Calendar',
   Settings = 'Settings',
+  PrayerSettings = 'PrayerSettings',
 }

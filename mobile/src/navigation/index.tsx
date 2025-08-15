@@ -5,6 +5,7 @@ import { Routes } from './routes';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { View } from 'react-native';
+import PrayerSettingsScreen from '../screens/PrayerSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,6 +28,11 @@ export function AppNavigator() {
         <Tab.Screen name={Routes.Zakat} children={() => <Placeholder name="Zakat" />} />
         <Tab.Screen name={Routes.Calendar} children={() => <Placeholder name="Calendar" />} />
         <Tab.Screen name={Routes.Settings} children={() => <Placeholder name="Settings" />} />
+        <Tab.Screen 
+          name={Routes.PrayerSettings} 
+          component={PrayerSettingsScreen}
+          options={{ title: 'Prayer Settings' }}
+        />
         {userRole === 'scholar' && (
           <Tab.Screen name={Routes.QAAnswer} children={() => <Placeholder name="QAAnswer" />} />
         )}

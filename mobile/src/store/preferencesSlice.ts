@@ -16,6 +16,13 @@ const initialState: PreferencesState = {
   prayer: {
     calculationMethod: 'MuslimWorldLeague',
     madhab: 'Shafi',
+    notifications: {
+      fajr: true,
+      dhuhr: true,
+      asr: true,
+      maghrib: true,
+      isha: true,
+    },
   },
 };
 
@@ -53,6 +60,18 @@ export async function loadPreferencesFromStorage(): Promise<Partial<PreferencesS
   const result: Partial<PreferencesState> = {};
   if (language) result.language = language;
   if (theme === 'light' || theme === 'dark' || theme === 'system') result.theme = theme;
-  if (prayer) result.prayer = prayer;
+  if (prayer) {
+    // Migrate old preferences that don't have notifications object
+    result.prayer = {
+      ...prayer,
+      notifications: prayer.notifications || {
+        fajr: true,
+        dhuhr: true,
+        asr: true,
+        maghrib: true,
+        isha: true,
+      },
+    };
+  }
   return result;
 }
