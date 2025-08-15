@@ -4,7 +4,7 @@ import { groupsService } from '@/services/groupsService';
 
 export type MutationRecord = {
 	id: string;
-	type: 'createComment' | 'setGroupProgress';
+	type: 'createComment' | 'setGroupProgress' | 'joinGroup' | 'leaveGroup';
 	payload: any;
 	createdAt: number;
 };
@@ -38,6 +38,12 @@ export async function flushOnce(): Promise<boolean> {
 				break;
 			case 'setGroupProgress':
 				await groupsService.setProgress(next.payload.groupId, next.payload);
+				break;
+			case 'joinGroup':
+				await groupsService.join(next.payload.groupId);
+				break;
+			case 'leaveGroup':
+				await groupsService.leave(next.payload.groupId);
 				break;
 			default:
 				break;
