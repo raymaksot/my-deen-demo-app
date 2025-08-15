@@ -1,6 +1,6 @@
-import { appStorage } from '@/utils/cache';
-import { commentsService } from '@/services/commentsService';
-import { groupsService } from '@/services/groupsService';
+import { appStorage } from '../utils/cache';
+import { commentsService } from '../services/commentsService';
+import { groupsService } from '../services/groupsService';
 
 export type MutationRecord = {
 	id: string;

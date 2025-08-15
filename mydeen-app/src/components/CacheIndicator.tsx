@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useTranslation } from 'react-i18next';
+// Note: useTranslation may need to be imported based on the actual i18n setup
+// import { useTranslation } from 'react-i18next';
 
 interface CacheIndicatorProps {
   isFromCache: boolean;
@@ -13,7 +14,7 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
   isStale = false, 
   style 
 }) => {
-  const { t } = useTranslation();
+  // const { t } = useTranslation(); // Uncomment when i18n is properly configured
   
   if (!isFromCache) return null;
   
@@ -21,8 +22,8 @@ export const CacheIndicator: React.FC<CacheIndicatorProps> = ({
     <View style={[styles.container, style]}>
       <Text style={[styles.text, isStale && styles.staleText]}>
         {isStale 
-          ? t('cache.staleIndicator', 'Данные могут быть устаревшими (оффлайн)')
-          : t('cache.indicator', 'Данные из кэша')
+          ? 'Данные могут быть устаревшими (оффлайн)' // t('cache.staleIndicator', 'Данные могут быть устаревшими (оффлайн)')
+          : 'Данные из кэша' // t('cache.indicator', 'Данные из кэша')
         }
       </Text>
     </View>

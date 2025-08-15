@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import NetInfo from '@react-native-community/netinfo';
-import { flushAll } from '@/offline/mutationQueue';
+import { flushAll } from '../offline/mutationQueue';
 
 export interface NetworkState {
   isConnected: boolean;

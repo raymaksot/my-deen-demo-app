@@ -1,5 +1,5 @@
 import { api } from './api';
-import { getCached, setCached, fetchWithOfflineSupport, CachedResponse } from '@/utils/cache';
+import { getCached, setCached, fetchWithOfflineSupport, CachedResponse } from '../utils/cache';
 
 export interface Surah {
 	number: number;

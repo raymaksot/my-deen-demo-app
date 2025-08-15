@@ -1,5 +1,5 @@
 import { api, Paginated } from './api';
-import { getCached, setCached, fetchWithOfflineSupport, CachedResponse } from '@/utils/cache';
+import { getCached, setCached, fetchWithOfflineSupport, CachedResponse } from '../utils/cache';
 
 export interface Hadith {
 	_id?: string;

@@ -1,5 +1,5 @@
 import { useNetworkStatus } from './useNetworkStatus';
-import { fetchWithOfflineSupport, CachedResponse } from '@/utils/cache';
+import { fetchWithOfflineSupport, CachedResponse } from '../utils/cache';
 import { useCallback } from 'react';
 
 export function useCachedData() {

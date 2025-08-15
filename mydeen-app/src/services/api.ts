@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { ENV } from '@/config/env';
+import axios, { AxiosRequestHeaders } from 'axios';
+import { ENV } from '../config/env';
 
 let authToken: string | null = null;
 
@@ -15,7 +15,7 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
 	if (authToken) {
 		if (!config.headers) {
-			config.headers = {};
+			config.headers = {} as AxiosRequestHeaders;
 		}
 		config.headers.Authorization = `Bearer ${authToken}`;
 	}
