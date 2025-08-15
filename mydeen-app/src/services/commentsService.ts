@@ -1,6 +1,6 @@
 import { apiDelete, apiGet, apiPost, apiPut } from './api';
 
-export type ParentType = 'article' | 'qaAnswer';
+export type ParentType = 'article' | 'qaAnswer' | 'comment';
 
 export interface CommentDto {
 	_id: string;
