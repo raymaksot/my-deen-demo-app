@@ -1,63 +1,52 @@
 import 'react-native-gesture-handler';
-import React, { useEffect } from 'react';
-import { StatusBar, View } from 'react-native';
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
-import { Provider } from 'react-redux';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import { store } from '@/store';
-import RootNavigator from '@/navigation/RootNavigator';
-import i18n from './src/i18n';
-import { useAppSelector } from '@/store/hooks';
-import { initAuthFromStorage } from '@/store/authSlice';
-import { registerBackgroundTasks } from '@/services/background';
-import { configureNotificationChannel, registerDeviceToken } from '@/notifications/registerDeviceToken';
-import { ENV } from '@/config/env';
-import { NetworkStatusBanner } from '@/components/NetworkStatusBanner'; 
-
-
-function AppInner() {
-	const themeMode = useAppSelector((s) => s.preferences.themeMode);
-	const locale = useAppSelector((s) => s.preferences.locale);
-	const navTheme = themeMode === 'dark' ? DarkTheme : DefaultTheme;
-
-	useEffect(() => {
-		store.dispatch(initAuthFromStorage());
-		(async () => {
-			if (Device.isDevice) {
-				await registerDeviceToken(ENV.API_BASE_URL || '');
-			}
-			await registerBackgroundTasks();
-		})();
-	}, []);
-
-	useEffect(() => {
-		i18n.changeLanguage(locale);
-	}, [locale]);
-
-	return (
-		<View style={{ flex: 1 }}>
-			<NavigationContainer theme={navTheme}>
-				<StatusBar barStyle={themeMode === 'dark' ? 'light-content' : 'dark-content'} />
-				<NetworkStatusBanner />
-				<RootNavigator />
-			</NavigationContainer>
-		</View>
-	);
-}
+import 'intl-pluralrules';
+import React from 'react';
+import { View, Text, TouchableOpacity, Alert, StyleSheet, StatusBar } from 'react-native';
 
 export default function App() {
-	Notifications.setNotificationHandler({
-		handleNotification: async () => ({
-			shouldShowAlert: true,
-			shouldPlaySound: true,
-			shouldSetBadge: false,
-		}),
-	});
+  const handleButtonPress = () => {
+    Alert.alert('Button works!');
+  };
 
-	return (
-		<Provider store={store}>
-			<AppInner />
-		</Provider>
-	);
+  return (
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+      <View style={styles.content}>
+        <Text style={styles.title}>✅ App is running</Text>
+        <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
+          <Text style={styles.buttonText}>Test Button</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 40,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
