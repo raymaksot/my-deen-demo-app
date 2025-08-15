@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Magnetometer, Accelerometer } from 'expo-sensors';
+import * as Location from 'expo-location';
 
 // Compute the tilt-compensated heading (degrees) from magnetometer and accelerometer readings.
 // Returns a value between 0 and 360, where 0 is north. Uses accelerometer data to compensate for device tilt.
@@ -35,6 +36,26 @@ function calculateHeading({ x, y }: { x: number; y: number }) {
   return angle >= 0 ? angle : angle + 360;
 }
 
+// Calculate the bearing from user's location to Kaaba (Mecca)
+function calculateBearingToKaaba(userLat: number, userLng: number): number {
+  const kaabaLat = 21.4225; // Kaaba latitude
+  const kaabaLng = 39.8262; // Kaaba longitude
+  
+  // Convert to radians
+  const lat1 = userLat * (Math.PI / 180);
+  const lat2 = kaabaLat * (Math.PI / 180);
+  const deltaLng = (kaabaLng - userLng) * (Math.PI / 180);
+  
+  // Calculate bearing using great circle formula
+  const y = Math.sin(deltaLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+  
+  let bearing = Math.atan2(y, x) * (180 / Math.PI);
+  
+  // Normalize to 0-360 degrees
+  return (bearing + 360) % 360;
+}
+
 /**
  * QiblaCompass renders a simple compass graphic that rotates an arrow toward
  * the Qibla direction based on the device’s magnetometer reading.  The
@@ -44,36 +65,106 @@ function calculateHeading({ x, y }: { x: number; y: number }) {
  */
 export default function QiblaCompass() {
   const [heading, setHeading] = useState(0);
-  const qiblaDirection = 118; // degrees from north toward Mecca for demo
+  const [qiblaDirection, setQiblaDirection] = useState(118); // fallback direction
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [magnetometerData, setMagnetometerData] = useState({ x: 0, y: 0, z: 0 });
+  const [accelerometerData, setAccelerometerData] = useState({ x: 0, y: 0, z: 0 });
+  
+  // Animated value for smooth arrow rotation
+  const rotationValue = useRef(new Animated.Value(0)).current;
 
+  // Get user location and calculate qibla direction
   useEffect(() => {
-    Magnetometer.setUpdateInterval(200);
-    const sub = Magnetometer.addListener((data) => {
-      setHeading(calculateHeading(data));
-    });
-    return () => sub && sub.remove();
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setLocationLoading(false);
+          return;
+        }
+        
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+        
+        const bearing = calculateBearingToKaaba(
+          location.coords.latitude,
+          location.coords.longitude
+        );
+        setQiblaDirection(bearing);
+      } catch (error) {
+        console.warn('Failed to get location, using fallback direction:', error);
+      } finally {
+        setLocationLoading(false);
+      }
+    })();
   }, []);
 
-  // Determine the rotation needed to point the arrow to the qibla.
-  // If heading is 0 (north) and qiblaDirection is 118°, the arrow should
-  // rotate 118°.  Subtract the current heading from the qibla direction.
-  const rotation = (qiblaDirection - heading + 360) % 360;
+  // Set up magnetometer
+  useEffect(() => {
+    Magnetometer.setUpdateInterval(200);
+    const magnetometerSub = Magnetometer.addListener((data) => {
+      setMagnetometerData(data);
+    });
+    return () => magnetometerSub && magnetometerSub.remove();
+  }, []);
+
+  // Set up accelerometer  
+  useEffect(() => {
+    Accelerometer.setUpdateInterval(200);
+    const accelerometerSub = Accelerometer.addListener((data) => {
+      setAccelerometerData(data);
+    });
+    return () => accelerometerSub && accelerometerSub.remove();
+  }, []);
+
+  // Calculate tilt-compensated heading when sensor data changes
+  useEffect(() => {
+    if (magnetometerData.x !== 0 || magnetometerData.y !== 0 || magnetometerData.z !== 0) {
+      const tiltCompensatedHeading = calculateTiltCompensatedHeading(
+        magnetometerData,
+        accelerometerData
+      );
+      setHeading(tiltCompensatedHeading);
+    }
+  }, [magnetometerData, accelerometerData]);
+
+  // Calculate rotation and animate arrow
+  useEffect(() => {
+    const rotation = (qiblaDirection - heading + 360) % 360;
+    
+    Animated.timing(rotationValue, {
+      toValue: rotation,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, [heading, qiblaDirection, rotationValue]);
+
+  // Convert animated value to rotation transform
+  const animatedRotation = rotationValue.interpolate({
+    inputRange: [0, 360],
+    outputRange: ['0deg', '360deg'],
+  });
 
   return (
     <View style={styles.container}>
       <View style={styles.compassOuter}>
-        <View
+        <Animated.View
           style={[
             styles.arrow,
             {
-              transform: [{ rotate: `${rotation}deg` }],
+              transform: [{ rotate: animatedRotation }],
             },
           ]}
         />
         <View style={styles.compassInner} />
       </View>
       <Text style={styles.headingText}>{heading.toFixed(0)}°</Text>
-      <Text style={styles.instruction}>Rotate until the arrow points up to face Qibla</Text>
+      {locationLoading ? (
+        <Text style={styles.instruction}>Getting your location...</Text>
+      ) : (
+        <Text style={styles.instruction}>Rotate until the arrow points up to face Qibla</Text>
+      )}
     </View>
   );
 }
