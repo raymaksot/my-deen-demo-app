@@ -122,7 +122,7 @@ export default function HomeScreen() {
                 <View style={styles.heroOverlay} />
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16 }}>
                     <View>
-                        <Text style={{ color: '#fff', fontSize: 14 }}>Assalamu'alaikum</Text>
+                        <Text style={{ color: '#fff', fontSize: 14 }}>{t('assalamuAlaikum')}</Text>
                         <Text style={{ color: '#fff', fontSize: 20, fontWeight: '700' }}>Fatimah Jaber</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('Notifications')}>

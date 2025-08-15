@@ -127,6 +127,9 @@ export const translations = {
       back: 'Back',
       close: 'Close',
       
+      // Greetings and common expressions
+      assalamuAlaikum: "Assalamu'alaikum",
+      
       // Home screen content
       nextPrayerIs: 'Next prayer is',
       findQibla: 'Find Qibla',
@@ -279,6 +282,9 @@ export const translations = {
       back: 'رجوع',
       close: 'إغلاق',
       
+      // Greetings and common expressions
+      assalamuAlaikum: 'السلام عليكم',
+      
       // Home screen content
       nextPrayerIs: 'الصلاة التالية هي',
       findQibla: 'البحث عن القبلة',
@@ -430,6 +436,9 @@ export const translations = {
       previous: 'Алдыңғы',
       back: 'Артқа',
       close: 'Жабу',
+      
+      // Greetings and common expressions
+      assalamuAlaikum: 'Ассаламу алейкум',
       
       // Home screen content
       nextPrayerIs: 'Келесі намаз',
