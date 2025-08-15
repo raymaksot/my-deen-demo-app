@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useThemeConfig } from '@/theme/theme';
 
 // Simple representation of an article used for the list.  In a real
 // application you would fetch this from your API.
@@ -67,17 +68,19 @@ const categories = ['Quran', 'Hadith', 'History', 'Creed', 'Manhaj', 'Fiqh'];
 export default function ArticlesScreen() {
   const navigation = useNavigation<any>();
   const [selectedCategory, setSelectedCategory] = useState('Quran');
+  const { colors, fontMultiplier } = useThemeConfig();
+  const styles = React.useMemo(() => createStyles(colors, fontMultiplier), [colors, fontMultiplier]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 24 }}>
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={{ fontSize: 20 }}>←</Text>
+          <Text style={{ fontSize: 20 * fontMultiplier, color: colors.text }}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Article</Text>
       </View>
       <View style={styles.searchBox}>
-        <Text style={{ color: '#9ca3af' }}>Search article title</Text>
+        <Text style={{ color: colors.muted, fontSize: 14 * fontMultiplier }}>Search article title</Text>
       </View>
       {/* Continue Reading */}
       <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
@@ -136,47 +139,48 @@ export default function ArticlesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16 },
-  backBtn: { padding: 4, marginRight: 8 },
-  headerTitle: { fontSize: 20, fontWeight: '600' },
-  searchBox: {
-    marginTop: 16,
-    marginHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    padding: 12,
-    backgroundColor: '#f9fafb',
-  },
-  sectionTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  continueCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#f3f4f6',
-  },
-  continueImage: { width: '100%', height: 180, borderTopLeftRadius: 16, borderTopRightRadius: 16, resizeMode: 'cover' },
-  continueTitle: { fontSize: 16, fontWeight: '700', marginTop: 4 },
-  continueAuthor: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  categoryLabel: { fontSize: 12, color: '#6b7280', marginBottom: 2 },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  seeAll: { color: '#0E7490', fontSize: 14, fontWeight: '600' },
-  tab: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: '#f9fafb',
-    marginRight: 8,
-  },
-  tabSelected: { backgroundColor: '#d1fae5' },
-  tabText: { fontSize: 14, color: '#6b7280' },
-  tabTextSelected: { color: '#0E7490', fontWeight: '600' },
-  articleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  articleImage: { width: 72, height: 72, borderRadius: 12, resizeMode: 'cover' },
-  articleTitle: { fontSize: 16, fontWeight: '600' },
-  articleAuthor: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-});
+const createStyles = (colors: { [key: string]: string }, fontMultiplier: number) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16 },
+    backBtn: { padding: 4, marginRight: 8 },
+    headerTitle: { fontSize: 20 * fontMultiplier, fontWeight: '600', color: colors.text },
+    searchBox: {
+      marginTop: 16,
+      marginHorizontal: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
+      padding: 12,
+      backgroundColor: colors.card,
+    },
+    sectionTitle: { fontSize: 18 * fontMultiplier, fontWeight: '700', marginBottom: 8, color: colors.text },
+    continueCard: {
+      borderRadius: 16,
+      overflow: 'hidden',
+      backgroundColor: colors.card,
+    },
+    continueImage: { width: '100%', height: 180, borderTopLeftRadius: 16, borderTopRightRadius: 16, resizeMode: 'cover' },
+    continueTitle: { fontSize: 16 * fontMultiplier, fontWeight: '700', marginTop: 4, color: colors.text },
+    continueAuthor: { fontSize: 12 * fontMultiplier, color: colors.muted, marginTop: 2 },
+    categoryLabel: { fontSize: 12 * fontMultiplier, color: colors.muted, marginBottom: 2 },
+    rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    seeAll: { color: colors.primary, fontSize: 14 * fontMultiplier, fontWeight: '600' },
+    tab: {
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+      backgroundColor: colors.card,
+      marginRight: 8,
+    },
+    tabSelected: { backgroundColor: colors.primary + '20' }, // 20% opacity
+    tabText: { fontSize: 14 * fontMultiplier, color: colors.muted },
+    tabTextSelected: { color: colors.primary, fontWeight: '600' },
+    articleRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+    },
+    articleImage: { width: 72, height: 72, borderRadius: 12, resizeMode: 'cover' },
+    articleTitle: { fontSize: 16 * fontMultiplier, fontWeight: '600', color: colors.text },
+    articleAuthor: { fontSize: 12 * fontMultiplier, color: colors.muted, marginTop: 2 },
+  });
