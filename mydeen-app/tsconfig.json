@@ -14,8 +14,7 @@
     "strict": true,
     "types": [
       "react",
-      "react-native",
-      "react-native-web"
+      "react-native"
     ],
     "baseUrl": ".",
     "paths": {
