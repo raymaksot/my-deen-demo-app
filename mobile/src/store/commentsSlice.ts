@@ -16,9 +16,9 @@ function keyFor(parentType: ParentType, parentId: string): string {
 
 export const fetchComments = createAsyncThunk(
   'comments/fetch',
-  async (payload: { parentType: ParentType; parentId: string; page?: number; limit?: number }) => {
+  async (payload: { parentType: ParentType; parentId: string; page?: number; limit?: number; append?: boolean }) => {
     const res = await commentsService.list(payload.parentType, payload.parentId, payload.page ?? 1, payload.limit ?? 20);
-    return { ...payload, res } as { parentType: ParentType; parentId: string; res: Paginated<CommentDto> };
+    return { ...payload, res } as { parentType: ParentType; parentId: string; page?: number; append?: boolean; res: Paginated<CommentDto> };
   }
 );
 
@@ -81,10 +81,18 @@ const slice = createSlice({
         state.byParent[k].loading = true;
       })
       .addCase(fetchComments.fulfilled, (state, action) => {
-        const { parentType, parentId, res } = action.payload;
+        const { parentType, parentId, res, append = false } = action.payload;
         const k = keyFor(parentType, parentId);
         state.byParent[k] = state.byParent[k] || { items: [], page: 1, total: 0, loading: false };
-        state.byParent[k].items = res.data;
+        
+        if (append) {
+          // Pagination: append new items to existing ones
+          state.byParent[k].items = [...state.byParent[k].items, ...res.data];
+        } else {
+          // Initial load: replace items
+          state.byParent[k].items = res.data;
+        }
+        
         state.byParent[k].page = res.page;
         state.byParent[k].total = res.total;
         state.byParent[k].loading = false;
