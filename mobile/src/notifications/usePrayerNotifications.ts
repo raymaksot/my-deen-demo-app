@@ -37,6 +37,9 @@ async function scheduleForDay({ coords, prefs, date = new Date() }: ScheduleInpu
 
   const created: Scheduled = [];
   for (const p of prayers) {
+    // Skip if notifications are disabled for this prayer
+    if (prefs.notifications && !prefs.notifications[p]) continue;
+    
     const when = times[p].getTime();
     if (when <= Date.now()) continue; // skip past times
     const id = await Notifications.scheduleNotificationAsync({
@@ -130,4 +133,39 @@ export async function unregisterMidnightRefresh(): Promise<void> {
   try {
     await BackgroundFetch.unregisterTaskAsync(BACKGROUND_TASK_NAME);
   } catch {}
+}
+
+/**
+ * Schedules daily prayer notifications based on preferences and times
+ * Cancels existing notifications before scheduling new ones
+ */
+export async function schedulePrayerNotifications(
+  prefs: PrayerPreferences, 
+  times: Record<PrayerKey, Date>
+): Promise<void> {
+  await cancelExisting();
+  
+  const prayers: PrayerKey[] = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+  const created: Scheduled = [];
+
+  for (const prayer of prayers) {
+    // Skip if notifications are disabled for this prayer
+    if (prefs.notifications && !prefs.notifications[prayer]) continue;
+    
+    const when = times[prayer].getTime();
+    if (when <= Date.now()) continue; // skip past times
+    
+    const id = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Prayer Time',
+        body: `It's time for ${prayer.toUpperCase()}`,
+        sound: 'default',
+        channelId: 'athans',
+      },
+      trigger: { date: new Date(when) },
+    });
+    created.push({ id, prayer, when });
+  }
+
+  await appStorage.setObject('notifications:athans', created);
 }
