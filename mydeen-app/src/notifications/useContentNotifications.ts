@@ -18,6 +18,13 @@ export function useContentNotifications() {
 
   // Expose scheduling helper for local content notifications
   async function scheduleLocal(payload: RemotePayload, when: Date) {
+    // Request notification permissions first
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      console.warn('Notification permission denied');
+      return;
+    }
+    
     await Notifications.scheduleNotificationAsync({ content: { title: payload.title, body: payload.body, data: payload.data }, trigger: { date: when } });
   }
 
