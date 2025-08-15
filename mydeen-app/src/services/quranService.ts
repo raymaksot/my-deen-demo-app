@@ -1,5 +1,5 @@
 import { api } from './api';
-import { getCached, setCached } from '@/utils/cache';
+import { getCached, setCached, fetchWithOfflineSupport, CachedResponse } from '@/utils/cache';
 
 export interface Surah {
 	number: number;
@@ -27,27 +27,53 @@ export interface DailyAyah extends Ayah {
 }
 
 export const quranService = {
-	async getSurahs(): Promise<Surah[]> {
+	async getSurahs(isConnected: boolean = true): Promise<CachedResponse<Surah[]>> {
 		const cacheKey = 'CACHE_QURAN_SURAHS_V1';
-		const cached = await getCached<Surah[]>(cacheKey);
-		if (cached) return cached;
-		const res = await api.get('/api/quran/surahs');
-		await setCached(cacheKey, res.data, 60 * 60 * 24 * 30); // 30 days
-		return res.data;
+		return fetchWithOfflineSupport(
+			cacheKey,
+			async () => {
+				const res = await api.get('/api/quran/surahs');
+				return res.data;
+			},
+			60 * 60 * 24 * 30, // 30 days
+			isConnected
+		);
 	},
-	async getSurahAyahs(surahNumber: number): Promise<Ayah[]> {
-		const res = await api.get(`/api/quran/surah/${surahNumber}`);
-		return res.data;
+	async getSurahAyahs(surahNumber: number, isConnected: boolean = true): Promise<CachedResponse<Ayah[]>> {
+		const cacheKey = `CACHE_QURAN_AYAHS_V1_${surahNumber}`;
+		return fetchWithOfflineSupport(
+			cacheKey,
+			async () => {
+				const res = await api.get(`/api/quran/surah/${surahNumber}`);
+				return res.data;
+			},
+			60 * 60 * 24 * 7, // 7 days
+			isConnected
+		);
 	},
-	async getDailyAyah(): Promise<DailyAyah> {
+	async getDailyAyah(isConnected: boolean = true): Promise<CachedResponse<DailyAyah>> {
 		const cacheKey = 'CACHE_DAILY_AYAH_V1';
 		const today = new Date().toDateString();
-		const cached = await getCached<{ayah: DailyAyah, date: string}>(cacheKey);
-		if (cached && cached.date === today) return cached.ayah;
 		
-		const res = await api.get('/api/quran/daily-ayah');
-		const dailyAyah = res.data;
-		await setCached(cacheKey, { ayah: dailyAyah, date: today }, 60 * 60 * 24); // 24 hours
-		return dailyAyah;
+		// For daily content, we need to check if it's for today
+		if (isConnected) {
+			const cached = await getCached<{ayah: DailyAyah, date: string}>(cacheKey);
+			if (cached && cached.date === today) {
+				return { data: cached.ayah, isFromCache: true };
+			}
+		}
+		
+		return fetchWithOfflineSupport(
+			cacheKey,
+			async () => {
+				const res = await api.get('/api/quran/daily-ayah');
+				const dailyAyah = res.data;
+				// Store with date for daily content
+				await setCached(cacheKey, { ayah: dailyAyah, date: today }, 60 * 60 * 24);
+				return dailyAyah;
+			},
+			60 * 60 * 24, // 24 hours
+			isConnected
+		);
 	},
 };

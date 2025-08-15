@@ -49,3 +49,68 @@ export async function setCached<T>(key: string, value: T, ttlSeconds: number): P
     console.error('Cache set error:', error);
   }
 }
+
+// Get cached data even if expired (for offline scenarios)
+export async function getCachedStale<T>(key: string): Promise<{ value: T; isStale: boolean } | null> {
+  try {
+    const cached = await appStorage.get(key) as CacheEntry<T> | null;
+    if (!cached) return null;
+    
+    const isStale = cached.expiresAt <= Date.now();
+    return { value: cached.value, isStale };
+  } catch (error) {
+    console.error('Cache get stale error:', error);
+    return null;
+  }
+}
+
+export interface CachedResponse<T> {
+  data: T;
+  isFromCache: boolean;
+  isStale?: boolean;
+}
+
+// Wrapper that tries network first, falls back to cache
+export async function fetchWithOfflineSupport<T>(
+  cacheKey: string,
+  networkFetcher: () => Promise<T>,
+  ttlSeconds: number,
+  isConnected: boolean = true
+): Promise<CachedResponse<T>> {
+  // If offline, try to get any cached data (even stale)
+  if (!isConnected) {
+    const staleData = await getCachedStale<T>(cacheKey);
+    if (staleData) {
+      return {
+        data: staleData.value,
+        isFromCache: true,
+        isStale: staleData.isStale
+      };
+    }
+    throw new Error('No cached data available and device is offline');
+  }
+  
+  // Check fresh cache first
+  const cached = await getCached<T>(cacheKey);
+  if (cached) {
+    return { data: cached, isFromCache: true };
+  }
+  
+  try {
+    // Try to fetch from network
+    const freshData = await networkFetcher();
+    await setCached(cacheKey, freshData, ttlSeconds);
+    return { data: freshData, isFromCache: false };
+  } catch (error) {
+    // Network failed, try stale cache
+    const staleData = await getCachedStale<T>(cacheKey);
+    if (staleData) {
+      return {
+        data: staleData.value,
+        isFromCache: true,
+        isStale: true
+      };
+    }
+    throw error;
+  }
+}

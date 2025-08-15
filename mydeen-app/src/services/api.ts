@@ -14,7 +14,9 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
 	if (authToken) {
-		config.headers = config.headers || {};
+		if (!config.headers) {
+			config.headers = {};
+		}
 		config.headers.Authorization = `Bearer ${authToken}`;
 	}
 	return config;

@@ -63,6 +63,12 @@ export function makeCacheKey(prefix: string, params?: Record<string, unknown>): 
   return `${prefix}:${stableStringify(params)}`;
 }
 
+export type CacheResult<T> = {
+  data: T;
+  isFromCache: boolean;
+  isStale: boolean;
+};
+
 export async function fetchWithCache<T>(
   key: string,
   fetcher: () => Promise<T>,
@@ -88,8 +94,49 @@ export async function fetchWithCache<T>(
   }
 }
 
+export async function fetchWithCacheResult<T>(
+  key: string,
+  fetcher: () => Promise<T>,
+  options: CacheOptions
+): Promise<CacheResult<T>> {
+  const { ttlMs, version, allowStaleOnError = true, keyPrefix } = options;
+
+  const existing = await getCachedEntry<T>(key, { keyPrefix });
+
+  // Return fresh cache if available
+  if (existing && existing.version === version && existing.expiresAt > now()) {
+    return {
+      data: existing.value,
+      isFromCache: true,
+      isStale: false
+    };
+  }
+
+  try {
+    const fresh = await fetcher();
+    await setCached<T>(key, fresh, { ttlMs, version, keyPrefix });
+    return {
+      data: fresh,
+      isFromCache: false,
+      isStale: false
+    };
+  } catch (error) {
+    if (existing && allowStaleOnError) {
+      return {
+        data: existing.value,
+        isFromCache: true,
+        isStale: true
+      };
+    }
+    throw error;
+  }
+}
+
 export const DefaultCacheTtls = {
   SurahList: 7 * 24 * 60 * 60 * 1000, // 7 days
   DuaList: 24 * 60 * 60 * 1000, // 1 day
   HadithCollections: 7 * 24 * 60 * 60 * 1000, // 7 days
+  QAList: 12 * 60 * 60 * 1000, // 12 hours
+  QAItem: 24 * 60 * 60 * 1000, // 1 day
+  HadithSearch: 2 * 60 * 60 * 1000, // 2 hours
 };
