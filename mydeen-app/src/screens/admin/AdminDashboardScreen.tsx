@@ -39,6 +39,13 @@ export default function AdminDashboardScreen({ navigation }: any) {
 			<View style={styles.actionsContainer}>
 				<TouchableOpacity
 					style={styles.actionButton}
+					onPress={() => navigation.navigate('AdminPendingComments')}
+				>
+					<Text style={styles.actionButtonText}>Manage Pending Comments</Text>
+				</TouchableOpacity>
+				
+				<TouchableOpacity
+					style={styles.actionButton}
 					onPress={() => navigation.navigate('AdminEvents')}
 				>
 					<Text style={styles.actionButtonText}>Manage Events</Text>
