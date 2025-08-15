@@ -1,4 +1,4 @@
-import { api, Paginated } from './api';
+import { api, Paginated, apiPost } from './api';
 
 export interface QAItem {
 	_id: string;
@@ -22,5 +22,11 @@ export const qaService = {
 	async answer(id: string, answer: string) {
 		const res = await api.post(`/api/qa/${id}/answer`, { answer });
 		return res.data as QAItem;
+	},
+	async toggleLikeAnswer(answerId: string): Promise<{ liked: boolean; likesCount: number }> {
+		return apiPost(`/api/likes/toggle`, { parentType: 'qaAnswer', parentId: answerId });
+	},
+	async getLikeStatus(answerId: string): Promise<{ liked: boolean; likesCount: number }> {
+		return apiPost(`/api/likes/status`, { parentType: 'qaAnswer', parentId: answerId });
 	},
 };

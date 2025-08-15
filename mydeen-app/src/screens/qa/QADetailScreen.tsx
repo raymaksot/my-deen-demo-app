@@ -5,7 +5,7 @@ import { qaService, QAItem } from '@/services/qaService';
 import { useAppSelector } from '@/store/hooks';
 import { CommentsThread } from '@/components/CommentsThread';
 import { useOfflineSync } from '@/offline/useOfflineSync';
-import { PrimaryButton, SecondaryButton, TextInputField } from '@/components/common';
+import { PrimaryButton, TextInputField } from '@/components/common';
 
 export default function QADetailScreen() {
 	const route = useRoute<any>();
@@ -15,12 +15,27 @@ export default function QADetailScreen() {
 	const [loading, setLoading] = useState(false);
 	const user = useAppSelector((s) => s.auth.user);
 	const [answerLikes, setAnswerLikes] = useState(0);
+	const [liked, setLiked] = useState(false);
 	const { pending } = useOfflineSync();
 
 	useEffect(() => {
 		(async () => {
 			const res = await qaService.get(id);
 			setItem(res);
+			
+			// Fetch like status for the answer if it exists
+			if (res._id) {
+				try {
+					const likeStatus = await qaService.getLikeStatus(res._id);
+					setAnswerLikes(likeStatus.likesCount);
+					setLiked(likeStatus.liked);
+				} catch (error) {
+					// If like status fails, just use defaults
+					console.warn('Failed to fetch like status:', error);
+					setAnswerLikes(0);
+					setLiked(false);
+				}
+			}
 		})();
 	}, [id]);
 
@@ -36,6 +51,17 @@ export default function QADetailScreen() {
 		}
 	}
 
+	async function toggleLike() {
+		if (!item?._id) return;
+		try {
+			const result = await qaService.toggleLikeAnswer(item._id);
+			setAnswerLikes(result.likesCount);
+			setLiked(result.liked);
+		} catch (error) {
+			console.error('Failed to toggle like:', error);
+		}
+	}
+
 	const canAnswer = user?.role === 'scholar' || user?.role === 'admin';
 
 	return (
@@ -44,14 +70,16 @@ export default function QADetailScreen() {
 			<Text style={styles.q}>{item?.question}</Text>
 			<Text style={styles.section}>Answer</Text>
 			<Text>{item?.answer || 'Not answered yet'}</Text>
-			<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-				<SecondaryButton 
-					title="Like answer"
-					onPress={() => setAnswerLikes((n) => n + 1)}
-					style={styles.likeBtn}
-				/>
-				<Text>{answerLikes} likes</Text>
-			</View>
+			{item?.answer && (
+				<View style={{ marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+					<TouchableOpacity 
+						onPress={toggleLike}
+						style={styles.likeBtn}
+					>
+						<Text style={{ color: liked ? '#ef4444' : '#6b7280' }}>❤️ {answerLikes}</Text>
+					</TouchableOpacity>
+				</View>
+			)}
 			{canAnswer && (
 				<View style={{ marginTop: 12 }}>
 					<TextInputField 
