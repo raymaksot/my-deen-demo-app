@@ -15,6 +15,13 @@ function toFutureDate(timeStr: string): Date | null {
 }
 
 export async function schedulePrayerNotifications(times: PrayerTimesResponse, prefs?: PrayerPreferences) {
+	// Request notification permissions first
+	const { status } = await Notifications.requestPermissionsAsync();
+	if (status !== 'granted') {
+		console.warn('Notification permission denied');
+		return;
+	}
+
 	// Cancel existing prayer notifications first
 	const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
 	const prayerNotifications = scheduledNotifications.filter(
@@ -48,6 +55,13 @@ export async function schedulePrayerNotifications(times: PrayerTimesResponse, pr
 
 export async function scheduleDailyContentNotification() {
 	try {
+		// Request notification permissions first
+		const { status } = await Notifications.requestPermissionsAsync();
+		if (status !== 'granted') {
+			console.warn('Notification permission denied');
+			return;
+		}
+
 		// Cancel any existing daily content notifications
 		const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
 		const dailyContentNotifications = scheduledNotifications.filter(

@@ -43,12 +43,18 @@ export default function EventDetailScreen() {
 	}, [id]);
 
 	async function register() {
+		// Request notification permissions first
+		const { status } = await Notifications.requestPermissionsAsync();
+		if (status !== 'granted') {
+			console.warn('Notification permission denied');
+		}
+
 		const r = await apiPost<{ registered: boolean; registrationsCount: number }>(`/api/events/${id}/register`);
 		setRegistered(true);
 		setCount(r.registrationsCount ?? count);
 		
-		// Schedule notification with selected interval
-		if (item?.startsAt) {
+		// Schedule notification with selected interval (only if permission granted)
+		if (status === 'granted' && item?.startsAt) {
 			const selectedOption = REMINDER_OPTIONS.find(opt => opt.value === selectedInterval);
 			const reminderMinutes = selectedOption?.minutes ?? 30;
 			const when = new Date(new Date(item.startsAt).getTime() - reminderMinutes * 60 * 1000);

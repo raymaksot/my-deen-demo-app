@@ -27,5 +27,12 @@ export async function registerForPushNotificationsAsync(): Promise<string | unde
 }
 
 export async function notifyContent(title: string, body: string, data?: Record<string, string>): Promise<void> {
+	// Request notification permissions first
+	const { status } = await Notifications.requestPermissionsAsync();
+	if (status !== 'granted') {
+		console.warn('Notification permission denied');
+		return;
+	}
+	
 	await Notifications.scheduleNotificationAsync({ content: { title, body, data }, trigger: null });
 }
