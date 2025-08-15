@@ -1,24 +1,11 @@
-export const lightTheme = {
-	colors: {
-		background: '#FFFFFF',
-		text: '#111111',
-		primary: '#0E7490',
-		card: '#F5F7FA',
-		border: '#E5E7EB',
-		muted: '#6B7280',
-	},
-};
-
-export const darkTheme = {
-	colors: {
-		background: '#0B1220',
-		text: '#F3F4F6',
-		primary: '#22D3EE',
-		card: '#111827',
-		border: '#1F2937',
-		muted: '#9CA3AF',
-	},
-};
+import { useAppSelector } from '@/store/hooks';
+import { 
+  lightTheme, 
+  darkTheme, 
+  lightHighContrastTheme, 
+  darkHighContrastTheme, 
+  fontSizeMultipliers 
+} from './constants';
 
 /**
  * Hook to return the current color palette based on the user's
@@ -29,12 +16,43 @@ export const darkTheme = {
  * hard‑coding values. Because it relies on a React hook from
  * the store it must only be invoked within a React component.
  */
-import { useAppSelector } from '@/store/hooks';
-
 export const useThemeColors = () => {
   // Retrieve the current theme mode ('light' | 'dark') from
   // the Redux preferences state. If no preference is set,
   // default to light mode.
   const themeMode = useAppSelector((s) => s.preferences.themeMode);
+  const highContrast = useAppSelector((s) => s.preferences.highContrast);
+  
+  if (highContrast) {
+    return themeMode === 'dark' ? darkHighContrastTheme.colors : lightHighContrastTheme.colors;
+  }
+  
   return themeMode === 'dark' ? darkTheme.colors : lightTheme.colors;
+};
+
+/**
+ * Hook to return the current font size multiplier based on user preferences
+ */
+export const useFontSize = () => {
+  const fontSize = useAppSelector((s) => s.preferences.fontSize);
+  return fontSizeMultipliers[fontSize];
+};
+
+/**
+ * Combined hook that returns both colors and font size multiplier
+ */
+export const useThemeConfig = () => {
+  const colors = useThemeColors();
+  const fontMultiplier = useFontSize();
+  
+  return { colors, fontMultiplier };
+};
+
+// Re-export constants for convenience
+export { 
+  lightTheme, 
+  darkTheme, 
+  lightHighContrastTheme, 
+  darkHighContrastTheme, 
+  fontSizeMultipliers 
 };

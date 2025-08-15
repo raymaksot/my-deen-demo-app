@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type ThemeMode = 'light' | 'dark';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface PrayerPreferences {
 	calculationMethod: string; // e.g., 'MWL', 'ISNA', 'Makkah'
@@ -11,12 +12,16 @@ export interface PrayerPreferences {
 export interface PreferencesState {
 	themeMode: ThemeMode;
 	locale: string;
+	fontSize: FontSize;
+	highContrast: boolean;
 	prayer: PrayerPreferences;
 }
 
 const initialState: PreferencesState = {
 	themeMode: 'light',
 	locale: 'en',
+	fontSize: 'medium',
+	highContrast: false,
 	prayer: {
 		calculationMethod: 'MWL',
 		highLatitudeRule: 'MidNight',
@@ -33,11 +38,17 @@ const preferencesSlice = createSlice({
 		setLocale(state, action: PayloadAction<string>) {
 			state.locale = action.payload;
 		},
+		setFontSize(state, action: PayloadAction<FontSize>) {
+			state.fontSize = action.payload;
+		},
+		setHighContrast(state, action: PayloadAction<boolean>) {
+			state.highContrast = action.payload;
+		},
 		setPrayerPreferences(state, action: PayloadAction<PrayerPreferences>) {
 			state.prayer = action.payload;
 		},
 	},
 });
 
-export const { setThemeMode, setLocale, setPrayerPreferences } = preferencesSlice.actions;
+export const { setThemeMode, setLocale, setFontSize, setHighContrast, setPrayerPreferences } = preferencesSlice.actions;
 export default preferencesSlice.reducer;

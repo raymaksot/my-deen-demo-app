@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { quranService, DailyAyah } from '@/services/quranService';
 import { hadithService, Hadith } from '@/services/hadithService';
-import { useThemeColors } from '@/theme/theme';
+import { useThemeConfig } from '@/theme/theme';
 
 interface DailyContentProps {
   style?: any;
@@ -20,8 +20,8 @@ export default function DailyContent({ style }: DailyContentProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const colors = useThemeColors();
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
+  const { colors, fontMultiplier } = useThemeConfig();
+  const styles = React.useMemo(() => createStyles(colors, fontMultiplier), [colors, fontMultiplier]);
 
   useEffect(() => {
     loadDailyContent();
@@ -114,13 +114,13 @@ export default function DailyContent({ style }: DailyContentProps) {
   );
 }
 
-const createStyles = (colors: { [key: string]: string }) =>
+const createStyles = (colors: { [key: string]: string }, fontMultiplier: number) =>
   StyleSheet.create({
     container: {
       marginVertical: 16,
     },
     sectionTitle: {
-      fontSize: 18,
+      fontSize: 18 * fontMultiplier,
       fontWeight: '700',
       color: colors.text,
       marginBottom: 16,
@@ -144,13 +144,13 @@ const createStyles = (colors: { [key: string]: string }) =>
       marginBottom: 12,
     },
     cardTitle: {
-      fontSize: 16,
+      fontSize: 16 * fontMultiplier,
       fontWeight: '600',
       color: colors.primary,
       marginBottom: 4,
     },
     surahInfo: {
-      fontSize: 12,
+      fontSize: 12 * fontMultiplier,
       color: colors.textSecondary || colors.text,
       opacity: 0.7,
     },
@@ -158,31 +158,31 @@ const createStyles = (colors: { [key: string]: string }) =>
       maxHeight: 120,
     },
     arabicText: {
-      fontSize: 18,
+      fontSize: 18 * fontMultiplier,
       fontWeight: '500',
       color: colors.text,
       textAlign: 'right',
-      lineHeight: 28,
+      lineHeight: 28 * fontMultiplier,
       marginBottom: 12,
       fontFamily: 'System', // Could be replaced with Arabic font
     },
     translationText: {
-      fontSize: 14,
+      fontSize: 14 * fontMultiplier,
       color: colors.text,
-      lineHeight: 20,
+      lineHeight: 20 * fontMultiplier,
       marginBottom: 8,
       fontStyle: 'italic',
     },
     tafsirText: {
-      fontSize: 12,
+      fontSize: 12 * fontMultiplier,
       color: colors.textSecondary || colors.text,
-      lineHeight: 18,
+      lineHeight: 18 * fontMultiplier,
       opacity: 0.8,
     },
     narratorText: {
-      fontSize: 12,
+      fontSize: 12 * fontMultiplier,
       color: colors.primary,
-      lineHeight: 18,
+      lineHeight: 18 * fontMultiplier,
       fontWeight: '500',
       textAlign: 'right',
     },
@@ -190,10 +190,11 @@ const createStyles = (colors: { [key: string]: string }) =>
       color: colors.text,
       marginTop: 8,
       textAlign: 'center',
+      fontSize: 14 * fontMultiplier,
     },
     errorText: {
       color: '#EF4444',
       textAlign: 'center',
-      fontSize: 14,
+      fontSize: 14 * fontMultiplier,
     },
   });
